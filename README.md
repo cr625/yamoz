@@ -339,3 +339,15 @@ The same git branch (deploy) exists in this dev directory so changes here will c
 1. Start YAMZ via `flask run`
 1. If you want to use migrations, first delete the alembic version from the restored db.
 1. `flask db init`
+
+# Docker
+
+To replicate the build environment in a container using Docker, first build the image using:
+
+`docker build -t yamz .`
+
+...then run the container with:
+
+`docker run -p 5003:5000 yamz`
+
+A web interface will then be available at `http://localhost:5003`.
