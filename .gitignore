@@ -23,5 +23,4 @@ __pycache__/
 .vscode/
 logs/
 migrations/
-yamz.sql
 git-sim_media
