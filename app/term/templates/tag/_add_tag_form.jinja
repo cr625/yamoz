@@ -1,13 +1,13 @@
-    <div class="container">
-	<br />
-        <div class="row px-4">
-            <div class="col">
-                <form action="{{ url_for('term.add_tag', term_id=selected_term.id) }}" method="post">
-                    {{ tag_form.hidden_tag() }}
-                    {{ tag_form.tag_list() }}
-                    {{ tag_form.submit() }}
-                </form>
-                <a href="{{url_for('term.list_tags')}}"><small>[edit tags]</small></a>
-            </div>
+<div class="container">
+    <br />
+    <div class="row px-4">
+        <div class="col">
+            <form action="{{ url_for('term.add_tag', term_id=selected_term.id) }}" method="post" class="form-control border-0 d-flex align-items-center">
+                {{ tag_form.hidden_tag() }}
+                {{ tag_form.tag_list(class_="form-select w-50") }}
+                {{ tag_form.submit(class_="btn btn-dark ms-2") }}
+            </form>
+            <a href="{{ url_for('term.list_tags') }}"><small>[edit tags]</small></a>
         </div>
     </div>
+</div>

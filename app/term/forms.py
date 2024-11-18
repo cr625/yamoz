@@ -9,7 +9,7 @@ class CreateTermForm(FlaskForm):
     term_string = StringField("Term string", validators=[DataRequired()])
     definition = PageDownField("Definition")
     examples = PageDownField("Examples")
-    draft =  BooleanField("Draft", default=True)
+    draft = BooleanField("Draft", default=True)
     submit = SubmitField("Submit")
 
 
@@ -31,13 +31,14 @@ class SearchForm(FlaskForm):
         if "csrf_enabled" not in kwargs:
             kwargs["csrf_enabled"] = False
         if "portal_tag" in kwargs:
-            self.portal_tag = kwargs.pop("portal_tag") 
+            self.portal_tag = kwargs.pop("portal_tag")
 
         super(SearchForm, self).__init__(*args, **kwargs)
 
 
 class TagForm(FlaskForm):
-    category = StringField("Category", validators=[DataRequired()], default="community")
+    category = StringField("Category", validators=[
+                           DataRequired()], default="community")
     value = StringField("Value", validators=[DataRequired()])
     domain = StringField("Domain")
     description = TextAreaField("Description")
@@ -45,6 +46,6 @@ class TagForm(FlaskForm):
 
 
 class AddTagForm(FlaskForm):
-    tag_list = SelectField("Tag", choices=["a", "b", "c"])
+    tag_list = SelectField("Tag")
 
-    submit = SubmitField("Apply")
+    submit = SubmitField("Apply Tag")
