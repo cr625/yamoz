@@ -1,6 +1,8 @@
 from email.policy import default
 import enum
 import re
+from rdflib import URIRef
+
 
 from app import db
 from app.user.models import User
@@ -55,21 +57,34 @@ class status(enum.Enum):
 class Relationship(db.Model):
     __tablename__ = "relationships"
     id = db.Column(db.Integer, primary_key=True)
-    parent_id = db.Column(db.Integer, db.ForeignKey("terms.id"))
-    child_id = db.Column(db.Integer, db.ForeignKey("terms.id"))
-    predicate = db.Column(db.String(64), default="instanceOf")
+    parent_id = db.Column(
+        db.Integer, db.ForeignKey("terms.id"), nullable=False)
+    child_id = db.Column(db.Integer, db.ForeignKey("terms.id"), nullable=False)
+    predicate_id = db.Column(
+        db.Integer, db.ForeignKey("terms.id"), nullable=False)
+    namespace = db.Column(db.String(128), nullable=True)
     timestamp = db.Column(db.DateTime, default=db.func.now())
+
+    # Establish relationships
+    predicate = db.relationship(
+        "Term", foreign_keys=[predicate_id], backref="relationships_as_predicate")
 
     def save(self):
         db.session.add(self)
         db.session.commit()
 
+    def get_predicate_uri(self):
+        if self.namespace:
+            return URIRef(f"{self.namespace}{self.predicate.term_string}")
+        return URIRef(self.predicate.term_string)
+
     def __repr__(self):
-        return "<Relationship {} {} {}>".format(
-            self.parent_id, self.predicate, self.child_id
-        )
+        return f"<Relationship {self.parent_id} {self.predicate.term_string} {self.child_id}>"
 
 
+'''
+This attaches signals to the Term model. Signals are used to trigger notifications and actions in response to changes in the database.
+'''
 term_signals = Namespace()
 
 term_saved = term_signals.signal("term_saved")
@@ -127,6 +142,7 @@ class Term(db.Model):
 
     comments = db.relationship("Comment", backref="term", lazy="dynamic")
 
+    # Relationships
     children = db.relationship(
         "Relationship",
         foreign_keys=[Relationship.parent_id],
