@@ -47,5 +47,10 @@ class TagForm(FlaskForm):
 
 class AddTagForm(FlaskForm):
     tag_list = SelectField("Tag")
-
     submit = SubmitField("Apply Tag")
+
+class AddPropertyForm(FlaskForm):
+    subject = StringField("Subject", validators=[DataRequired()])
+    predicate = StringField("Predicate", validators=[DataRequired()])
+    object = StringField("Object", validators=[DataRequired()])
+    submit = SubmitField("Submit")

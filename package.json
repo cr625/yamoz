@@ -1,0 +1,18 @@
+{
+  "name": "yamz-o",
+  "version": "1.0.0",
+  "description": "This is the README for the YAMZ vocabulary builder for data and metadata. It includes instructions for deploying on a local machine for testing and on a Linux-based environment for a scalable production version (coming soon).",
+  "main": "index.js",
+  "directories": {
+    "doc": "doc"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@tarekraafat/autocomplete.js": "^10.2.9"
+  }
+}

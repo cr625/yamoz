@@ -1,0 +1,35 @@
+<form method="post">
+    {{ form.hidden_tag() }}
+    <div class="card col-7">
+        <h5 class="card-header">Add Property</h5>
+        <div class="card-body">
+            <!-- Subject Field -->
+            <div class="form-group row py-2">
+                <label for="Subject" class="col-2 col-form-label">
+                    {{ form.subject.label.text }}
+                </label>
+                <div class="col">
+                    {{ form.subject(class="form-control", id="Subject") }}
+                </div>
+            </div>
+            <!-- Predicate Field -->
+            <div class="form-group row py-2">
+                <label for="Predicate" class="col-2 col-form-label">
+                    {{ form.predicate.label.text }}
+                </label>
+                <div class="col">
+                    {{ form.predicate(class="form-control", id="Predicate") }}
+                </div>
+            </div>
+            <div class="form-group row py-2">
+                <label for="Object" class="col-2 col-form-label">
+                    {{ form.object.label.text }}
+                </label>
+                <div class="col">
+                    {{ form.object(class="form-control", id="Object") }}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</form>
