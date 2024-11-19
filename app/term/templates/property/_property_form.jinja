@@ -3,32 +3,87 @@
     <div class="card col-7">
         <h5 class="card-header">Add Property</h5>
         <div class="card-body">
-            <div class="row">
-                <!-- Subject Field -->
-                <div class="col-4">
-                    <div class="form-group">
-                        <label for="subject" class="form-label">
-                            {{ form.subject.label.text }}
-                        </label>
-                        {{ form.subject(class="form-control", id="subject") }}
+            <!-- Tabs Navigation -->
+            <ul class="nav nav-tabs" id="propertyTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="form-tab" data-bs-toggle="tab" data-bs-target="#formFields"
+                        type="button" role="tab" aria-controls="formFields" aria-selected="true">
+                        Form Fields
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="lookup-tab" data-bs-toggle="tab" data-bs-target="#lookupFields"
+                        type="button" role="tab" aria-controls="lookupFields" aria-selected="false">
+                        Lookup by ID
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tabs Content -->
+            <div class="tab-content" id="propertyTabsContent">
+                <!-- Form Fields Tab -->
+                <div class="tab-pane fade show active" id="formFields" role="tabpanel" aria-labelledby="form-tab">
+                    <div class="row mt-3">
+                        <!-- Subject Field -->
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="subject" class="form-label">
+                                    {{ form.subject.label.text }}
+                                </label>
+                                {{ form.subject(class="form-control", id="subject") }}
+                            </div>
+                        </div>
+                        <!-- Predicate Field -->
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="predicate" class="form-label">
+                                    {{ form.predicate.label.text }}
+                                </label>
+                                {{ form.predicate(class="form-control", id="predicate") }}
+                            </div>
+                        </div>
+                        <!-- Object Field -->
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="object" class="form-label">
+                                    {{ form.object.label.text }}
+                                </label>
+                                {{ form.object(class="form-control", id="object") }}
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <!-- Predicate Field -->
-                <div class="col-4">
-                    <div class="form-group">
-                        <label for="predicate" class="form-label">
-                            {{ form.predicate.label.text }}
-                        </label>
-                        {{ form.predicate(class="form-control", id="predicate") }}
-                    </div>
-                </div>
-                <!-- Object Field -->
-                <div class="col-4">
-                    <div class="form-group">
-                        <label for="object" class="form-label">
-                            {{ form.object.label.text }}
-                        </label>
-                        {{ form.object(class="form-control", id="object") }}
+
+                <!-- Lookup by ID Tab -->
+                <div class="tab-pane fade" id="lookupFields" role="tabpanel" aria-labelledby="lookup-tab">
+                    <div class="row mt-3">
+                        <!-- Subject ID Field -->
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="subjectId" class="form-label">
+                                    Lookup Subject by ID
+                                </label>
+                                {{ form.subject_id(class="form-control", id="subjectId") }}
+                            </div>
+                        </div>
+                        <!-- Predicate ID Field -->
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="predicateId" class="form-label">
+                                    Lookup Predicate by ID
+                                </label>
+                                {{ form.predicate_id(class="form-control", id="predicateId") }}
+                            </div>
+                        </div>
+                        <!-- Object ID Field -->
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="objectId" class="form-label">
+                                    Lookup Object by ID
+                                </label>
+                                {{ form.object_id(class="form-control", id="objectId") }}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
