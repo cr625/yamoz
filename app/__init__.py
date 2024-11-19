@@ -32,6 +32,7 @@ def create_app(config_class=Config):
     app.config["UPLOADS_DEFAULT_DEST"] = "uploads"
     app.config["UPLOADED_FILES_DEST"] = "uploads"
 
+
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
