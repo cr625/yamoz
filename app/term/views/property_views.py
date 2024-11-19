@@ -13,4 +13,4 @@ def add_property():
     if property_form.validate_on_submit():
         flash("Property added")
         return redirect(url_for("term.index"))
-    return render_template("property/create_property.jinja", form=property_form)
+    return render_template("property/add_property.jinja", form=property_form)

@@ -3,33 +3,61 @@
     <div class="card col-7">
         <h5 class="card-header">Add Property</h5>
         <div class="card-body">
-            <!-- Subject Field -->
-            <div class="form-group row py-2">
-                <label for="Subject" class="col-2 col-form-label">
-                    {{ form.subject.label.text }}
-                </label>
-                <div class="col">
-                    {{ form.subject(class="form-control", id="Subject") }}
+            <div class="row">
+                <!-- Subject Field -->
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="subject" class="form-label">
+                            {{ form.subject.label.text }}
+                        </label>
+                        {{ form.subject(class="form-control", id="subject") }}
+                    </div>
+                </div>
+                <!-- Predicate Field -->
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="predicate" class="form-label">
+                            {{ form.predicate.label.text }}
+                        </label>
+                        {{ form.predicate(class="form-control", id="predicate") }}
+                    </div>
+                </div>
+                <!-- Object Field -->
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="object" class="form-label">
+                            {{ form.object.label.text }}
+                        </label>
+                        {{ form.object(class="form-control", id="object") }}
+                    </div>
                 </div>
             </div>
-            <!-- Predicate Field -->
-            <div class="form-group row py-2">
-                <label for="Predicate" class="col-2 col-form-label">
-                    {{ form.predicate.label.text }}
-                </label>
-                <div class="col">
-                    {{ form.predicate(class="form-control", id="Predicate") }}
-                </div>
-            </div>
-            <div class="form-group row py-2">
-                <label for="Object" class="col-2 col-form-label">
-                    {{ form.object.label.text }}
-                </label>
-                <div class="col">
-                    {{ form.object(class="form-control", id="Object") }}
-                </div>
-            </div>
-
         </div>
     </div>
+
 </form>
+
+<div class="autoComplete_wrapper">
+    <input id="autoComplete" type="search" dir="ltr" spellcheck=false autocorrect="off" autocomplete="off"
+        autocapitalize="off">
+</div>
+<script>
+    const autoCompleteJS = new autoComplete({
+        placeHolder: "Search for term...",
+        data: {
+            src: ["Sauce - Thousand Island", "Wild Boar - Tenderloin", "Goat - Whole Cut"],
+            cache: true,
+        },
+        resultItem: {
+            highlight: true
+        },
+        events: {
+            input: {
+                selection: (event) => {
+                    const selection = event.detail.selection.value;
+                    autoCompleteJS.input.value = selection;
+                }
+            }
+        }
+    });
+</script>
