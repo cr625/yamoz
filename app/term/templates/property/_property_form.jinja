@@ -1,19 +1,19 @@
 <form method="post">
     {{ form.hidden_tag() }}
-    <div class="card col-7">
+    <div class="card col-12" style="height: 75vh;">
         <h5 class="card-header">Add Property</h5>
         <div class="card-body">
             <!-- Tabs Navigation -->
             <ul class="nav nav-tabs" id="propertyTabs" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="form-tab" data-bs-toggle="tab" data-bs-target="#formFields"
-                        type="button" role="tab" aria-controls="formFields" aria-selected="true">
-                        Form Fields
+                    <button class="nav-link disabled" id="form-tab" data-bs-toggle="tab" data-bs-target="#formFields"
+                        type="button" role="tab" aria-controls="formFields" aria-selected="false">
+                        Lookup by Term String
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="lookup-tab" data-bs-toggle="tab" data-bs-target="#lookupFields"
-                        type="button" role="tab" aria-controls="lookupFields" aria-selected="false">
+                    <button class="nav-link active" id="lookup-tab" data-bs-toggle="tab" data-bs-target="#lookupFields"
+                        type="button" role="tab" aria-controls="lookupFields" aria-selected="true">
                         Lookup by ID
                     </button>
                 </li>
@@ -91,28 +91,3 @@
     </div>
 
 </form>
-
-<div class="autoComplete_wrapper">
-    <input id="autoComplete" type="search" dir="ltr" spellcheck=false autocorrect="off" autocomplete="off"
-        autocapitalize="off">
-</div>
-<script>
-    const autoCompleteJS = new autoComplete({
-        placeHolder: "Search for term...",
-        data: {
-            src: ["Sauce - Thousand Island", "Wild Boar - Tenderloin", "Goat - Whole Cut"],
-            cache: true,
-        },
-        resultItem: {
-            highlight: true
-        },
-        events: {
-            input: {
-                selection: (event) => {
-                    const selection = event.detail.selection.value;
-                    autoCompleteJS.input.value = selection;
-                }
-            }
-        }
-    });
-</script>
