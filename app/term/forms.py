@@ -37,8 +37,17 @@ class SearchForm(FlaskForm):
 
 
 class TagForm(FlaskForm):
+    category = SelectField("Category", validators=[
+                           DataRequired()], choices=[], default="community")
+    value = StringField("Value", validators=[DataRequired()])
+    domain = StringField("Domain")
+    description = TextAreaField("Description")
+    submit = SubmitField("Save")
+
+
+class EditTagForm(FlaskForm):
     category = StringField("Category", validators=[
-                           DataRequired()], default="community")
+                           DataRequired()])
     value = StringField("Value", validators=[DataRequired()])
     domain = StringField("Domain")
     description = TextAreaField("Description")
@@ -48,6 +57,7 @@ class TagForm(FlaskForm):
 class AddTagForm(FlaskForm):
     tag_list = SelectField("Tag")
     submit = SubmitField("Apply Tag")
+
 
 class AddPropertyForm(FlaskForm):
     subject = StringField("Subject", validators=[DataRequired()])

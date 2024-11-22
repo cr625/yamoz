@@ -1,12 +1,34 @@
 from app.term import term_blueprint as term
-from app.term.forms import TagForm, AddTagForm
+from app.term.forms import TagForm, AddTagForm, EditTagForm
 from app.term.models import Tag, Term
 from flask import render_template, redirect, url_for, flash
 from flask_login import login_required
 
+
+@term.route("tag/create", methods=["GET", "POST"])
 @term.route("tag/create", methods=["GET", "POST"])
 def create_tag():
+    # Default categories
+    default_categories = {"community", "source", "relationship"}
+
+    # Check and add default categories if not present
+    for category in default_categories:
+        if not Tag.query.filter_by(category=category).first():
+            new_tag = Tag(category=category, value=category,
+                          description=f"Default {category} tag", domain="default")
+            new_tag.save()
+
+    # Get all unique categories from the database
+    all_categories = Tag.query.with_entities(Tag.category).distinct().all()
+    all_categories = {category[0] for category in all_categories}
+
+    # Combine default categories with categories from the database
+    combined_categories = default_categories.union(all_categories)
+
     tag_form = TagForm()
+    tag_form.category.choices = [(category, category)
+                                 for category in combined_categories]
+
     if tag_form.validate_on_submit():
         tag_category = tag_form.category.data
         tag_value = tag_form.value.data
@@ -25,14 +47,13 @@ def create_tag():
             flash("Tag already exists")
             return redirect(url_for("term.edit_tag", tag_id=tag.id))
 
-    else:
-        return render_template("tag/create_tag.jinja", form=tag_form)
+    return render_template("tag/create_tag.jinja", form=tag_form)
 
 
 @term.route("tag/edit/<int:tag_id>", methods=["GET", "POST"])
 @login_required
 def edit_tag(tag_id):
-    tag_form = TagForm()
+    tag_form = EditTagForm()
     tag = Tag.query.get_or_404(tag_id)
     if tag_form.validate_on_submit():
         tag.category = tag_form.category.data
@@ -86,4 +107,3 @@ def remove_tag(term_id, tag_id):
 def list_tags():
     tags = Tag.query.order_by(Tag.value)
     return render_template("tag/list_tags.jinja", tags=tags)
-
