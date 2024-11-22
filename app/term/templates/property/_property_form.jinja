@@ -9,7 +9,7 @@
                 <div class="col-4">
                     <div class="form-group">
                         <label for="subjectId" class="form-label">
-                            Lookup Subject by ID
+                            Lookup Subject Term by ID
                         </label>
                         {{ form.subject_id(class="form-control", id="subjectId") }}
                         <div id="subject_term_string" class="term-string"></div>
@@ -20,7 +20,7 @@
                 <div class="col-4">
                     <div class="form-group">
                         <label for="predicateId" class="form-label">
-                            Lookup Predicate by ID
+                            Relationship
                         </label>
                         {{ form.predicate_id(class="form-control", id="predicateId") }}
                         <div id="predicate_term_string" class="term-string"></div>
@@ -31,7 +31,7 @@
                 <div class="col-4">
                     <div class="form-group">
                         <label for="objectId" class="form-label">
-                            Lookup Object by ID
+                            Lookup Object Term by ID
                         </label>
                         {{ form.object_id(class="form-control", id="objectId") }}
                         <div id="object_term_string" class="term-string"></div>
@@ -42,8 +42,12 @@
         </div>
     </div>
 </form>
+
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        console.log(typeof marked); // Verify that marked is loaded
+
         const subjectField = document.getElementById('subjectId');
         const predicateField = document.getElementById('predicateId');
         const objectField = document.getElementById('objectId');
@@ -62,16 +66,16 @@
                     if (data.term_string && data.definition) {
                         const termStringElement = document.getElementById(`${fieldName}_term_string`);
                         termStringElement.innerHTML = `<a href="/term/ark/${conceptID}">${data.term_string}</a>`;
-                        document.getElementById(`${fieldName}_definition`).innerText = data.definition;
+                        document.getElementById(`${fieldName}_definition`).innerHTML = marked.marked(data.definition);
                     } else {
                         document.getElementById(`${fieldName}_term_string`).innerHTML = '';
-                        document.getElementById(`${fieldName}_definition`).innerText = '';
+                        document.getElementById(`${fieldName}_definition`).innerHTML = '';
                     }
                 })
                 .catch(error => console.error('Error fetching term data:', error));
         } else {
             document.getElementById(`${fieldName}_term_string`).innerHTML = '';
-            document.getElementById(`${fieldName}_definition`).innerText = '';
+            document.getElementById(`${fieldName}_definition`).innerHTML = '';
         }
     }
 </script>

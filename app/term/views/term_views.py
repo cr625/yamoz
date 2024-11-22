@@ -182,7 +182,7 @@ def create_term():
                 new_term.tags.append(Tag.query.filter_by(
                     value=session['portal_tag']).first())
             new_term.save()
-            return redirect(url_for("term.display_term", concept_id=new_term.concept_id))
+        return redirect(url_for("term.display_term", concept_id=new_term.concept_id))
 
     return render_template("term/create_term.jinja", form=form)
 
