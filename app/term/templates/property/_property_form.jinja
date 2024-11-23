@@ -1,6 +1,6 @@
 <form method="post">
     {{ form.hidden_tag() }}
-    <div class="card col-12" style="height: 75vh;">
+    <div class="card col-12" id="propertyCard">
         <h5 class="card-header">Add Property</h5>
         <div class="card-body">
             <!-- Lookup by ID Fields -->
@@ -9,9 +9,9 @@
                 <div class="col-4">
                     <div class="form-group">
                         <label for="subjectId" class="form-label">
-                            Lookup Subject Term by ID
+                            Subject Term ID
                         </label>
-                        {{ form.subject_id(class="form-control", id="subjectId") }}
+                        {{ form.subject_id(class="form-control", id="subjectId", required=True) }}
                         <div id="subject_term_string" class="term-string"></div>
                         <div id="subject_definition" class="definition"></div>
                     </div>
@@ -20,9 +20,9 @@
                 <div class="col-4">
                     <div class="form-group">
                         <label for="predicateId" class="form-label">
-                            Relationship
+                            Predicate
                         </label>
-                        {{ form.predicate_id(class="form-control", id="predicateId") }}
+                        {{ form.predicate_id(class="form-control", id="predicateId", required=True) }}
                         <div id="predicate_term_string" class="term-string"></div>
                         <div id="predicate_definition" class="definition"></div>
                     </div>
@@ -31,9 +31,9 @@
                 <div class="col-4">
                     <div class="form-group">
                         <label for="objectId" class="form-label">
-                            Lookup Object Term by ID
+                            Object Term by ID
                         </label>
-                        {{ form.object_id(class="form-control", id="objectId") }}
+                        {{ form.object_id(class="form-control", id="objectId", required=True) }}
                         <div id="object_term_string" class="term-string"></div>
                         <div id="object_definition" class="definition"></div>
                     </div>
@@ -41,13 +41,15 @@
             </div>
         </div>
     </div>
+    <div class="form-group row py-4">
+        <div class="col-sm-7">
+            {{ form.submit(class="btn btn-dark") }}
+        </div>
+    </div>
 </form>
-
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        console.log(typeof marked); // Verify that marked is loaded
-
         const subjectField = document.getElementById('subjectId');
         const predicateField = document.getElementById('predicateId');
         const objectField = document.getElementById('objectId');
@@ -55,6 +57,8 @@
         subjectField.addEventListener('input', () => fetchTermData(subjectField, 'subject'));
         predicateField.addEventListener('input', () => fetchTermData(predicateField, 'predicate'));
         objectField.addEventListener('input', () => fetchTermData(objectField, 'object'));
+
+
     });
 
     function fetchTermData(field, fieldName) {

@@ -5,8 +5,8 @@ from flask import render_template, redirect, url_for, flash, request
 
 
 @term.route("/property", methods=["GET", "POST"])
-def index():
-    return "property"
+def display_relation():
+    return "property ddd"
 
 
 def get_terms_with_relationship_tag():
@@ -25,9 +25,5 @@ def add_property():
     property_form.predicate_id.choices = choices
 
     if property_form.validate_on_submit():
-        if property_form.predicate_id.data == '':
-            flash("Please select a valid relationship.")
-        else:
-            flash("Property added")
-            return redirect(url_for("term.index"))
+        return redirect(url_for("term.display_relation"))
     return render_template("property/add_property.jinja", form=property_form)

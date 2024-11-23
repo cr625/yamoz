@@ -7,13 +7,14 @@ from rdflib import URIRef
 from app import db
 from app.user.models import User
 from blinker import Namespace
-from sqlalchemy import Index, case, select
+from sqlalchemy import Index, case, select, Sequence
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.ext.hybrid import hybrid_property
 from markdown import markdown
 import bleach
 
 SHOULDER = "h"
+REL_SHOULDER = "g"
 NAAN = "99152"
 
 allowed_tags = [
@@ -56,7 +57,17 @@ class status(enum.Enum):
 
 class Relationship(db.Model):
     __tablename__ = "relationships"
+    ark_id_seq = Sequence('ark_id_seq', start=1000)
     id = db.Column(db.Integer, primary_key=True)
+    ark_id = db.Column(db.Integer, unique=True,
+                       server_default=ark_id_seq.next_value())
+    shoulder = db.Column(db.String(64), default=REL_SHOULDER)
+    naan = db.Column(db.String(64), default=NAAN)
+    owner_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    created = db.Column(db.DateTime, default=db.func.now())
+    modified = db.Column(db.DateTime, default=db.func.now(),
+                         onupdate=db.func.now())
+
     parent_id = db.Column(
         db.Integer, db.ForeignKey("terms.id"), nullable=False)
     child_id = db.Column(db.Integer, db.ForeignKey("terms.id"), nullable=False)
