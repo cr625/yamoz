@@ -18,6 +18,10 @@ def process_csv_upload(data_file):
     return csv_dataframe.to_dict(orient="records")
 
 
+def process_owl_upload(data_file):
+    pass
+
+
 def import_term_dict(term_dict, term_set):
     term_list = []
     for term in term_dict:

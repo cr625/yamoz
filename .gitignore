@@ -10,7 +10,6 @@ _build
 env
 venv
 settings.json
-migrations/
 .vscode/
 .vscode/launch.json
 localhost-key.pem

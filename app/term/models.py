@@ -6,16 +6,20 @@ from rdflib import URIRef
 
 from app import db
 from app.user.models import User
+from config import Config
 from blinker import Namespace
-from sqlalchemy import Index, case, select, Sequence
+from sqlalchemy import Index, case, select, Sequence, func
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import column_property
 from markdown import markdown
 import bleach
 
-SHOULDER = "h"
-REL_SHOULDER = "g"
-NAAN = "99152"
+SHOULDER = Config.SHOULDER
+NAAN = Config.NAAN
+
+ark_id_seq = Sequence('ark_id_seq', start=1000)
+
 
 allowed_tags = [
     "a",
@@ -55,19 +59,46 @@ class status(enum.Enum):
     deleted = (4, "deleted")
 
 
-class Relationship(db.Model):
-    __tablename__ = "relationships"
-    ark_id_seq = Sequence('ark_id_seq', start=1000)
+class Ark(db.Model):
+    __tablename__ = "arks"
     id = db.Column(db.Integer, primary_key=True)
     ark_id = db.Column(db.Integer, unique=True,
-                       server_default=ark_id_seq.next_value())
-    shoulder = db.Column(db.String(64), default=REL_SHOULDER)
+                       server_default=db.FetchedValue())
+    shoulder = db.Column(db.String(64), default=SHOULDER)
     naan = db.Column(db.String(64), default=NAAN)
+    created = db.Column(db.DateTime, default=db.func.now())
+    modified = db.Column(db.DateTime, default=db.func.now(),
+                         onupdate=db.func.now())
+    concept_id = column_property(func.concat(shoulder, ark_id))
+
+    @classmethod
+    def create_ark(cls, shoulder=None, naan=None):
+        if shoulder is None:
+            shoulder = SHOULDER
+        if naan is None:
+            naan = NAAN
+
+        # Get the next value from the sequence
+        next_ark_id_value = db.session.execute(ark_id_seq)
+
+        # Create a new Ark instance with the next ark_id
+        new_ark = cls(shoulder=shoulder, naan=naan, ark_id=next_ark_id_value)
+        db.session.add(new_ark)
+        db.session.commit()
+        return new_ark
+
+    def __repr__(self):
+        return f"<Ark {self.shoulder}{self.ark_id}>"
+
+
+class Relationship(db.Model):
+    __tablename__ = "relationships"
+    id = db.Column(db.Integer, primary_key=True)
+    ark_id = db.Column(db.Integer, db.ForeignKey("arks.id"), nullable=True)
     owner_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     created = db.Column(db.DateTime, default=db.func.now())
     modified = db.Column(db.DateTime, default=db.func.now(),
                          onupdate=db.func.now())
-
     parent_id = db.Column(
         db.Integer, db.ForeignKey("terms.id"), nullable=False)
     child_id = db.Column(db.Integer, db.ForeignKey("terms.id"), nullable=False)
@@ -79,6 +110,15 @@ class Relationship(db.Model):
     # Establish relationships
     predicate = db.relationship(
         "Term", foreign_keys=[predicate_id], backref="relationships_as_predicate")
+
+    ark = db.relationship("Ark", foreign_keys=[
+                          ark_id], backref="relationships")
+
+    @hybrid_property
+    def ark_concept_id(self):
+        if self.ark:
+            return self.ark.concept_id
+        return None
 
     def save(self):
         db.session.add(self)
