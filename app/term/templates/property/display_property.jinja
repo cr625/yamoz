@@ -1,0 +1,16 @@
+{% extends 'base.jinja' %}
+
+{% block title %}
+Display Relationship
+{% endblock %}
+
+{% block content %}
+<h2>Relationship Details</h2>
+<p><strong>Subject:</strong> {{ relationship.parent.term_string }}</p>
+<p><strong>Predicate:</strong> {{ relationship.predicate.term_string }}</p>
+<p><strong>Object:</strong> {{ relationship.child.term_string }}</p>
+<a href="{{ url_for('term.edit_property', relationship_id=relationship.id) }}" class="btn btn-primary">Edit</a>
+<form action="{{ url_for('term.delete_property', relationship_id=relationship.id) }}" method="post" style="display:inline;">
+    <button type="submit" class="btn btn-danger">Delete</button>
+</form>
+{% endblock %}

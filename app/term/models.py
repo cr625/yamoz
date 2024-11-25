@@ -124,6 +124,10 @@ class Relationship(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
     def get_predicate_uri(self):
         if self.namespace:
             return URIRef(f"{self.namespace}{self.predicate.term_string}")
