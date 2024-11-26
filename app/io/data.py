@@ -1,7 +1,7 @@
 import json
 import os
 from urllib import request
-
+from app.io.ontology import OwlHandler
 import pandas
 from app import db
 from app.term.helpers import get_ark_id
@@ -19,11 +19,12 @@ def process_csv_upload(data_file):
 
 
 def process_owl_upload(data_file, set_tag):
-    return data_file.filename + " " + set_tag.value
+    handler = OwlHandler("app/io/import/bfo.owl")
+    terms = handler.get_ontology_terms()
+    return terms
 
 
 def import_term_dict(term_dict, term_set):
-    term_list = []
     for term in term_dict:
         term_string = term["term"]
         definition = term["definition"]

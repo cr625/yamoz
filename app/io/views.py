@@ -1,12 +1,13 @@
-# from app import data
+from flask import (current_app, flash, redirect, render_template, request,
+                   send_file, url_for)
+from flask_login import current_user, login_required
+
 from app import db
 from app.io import io_blueprint as io
 from app.io.data import *
 from app.io.forms import DataFileUploadForm, EmptyForm
-from app.term.models import TermSet, Tag
-from flask import render_template, request, send_file, current_app, flash, redirect, url_for
-from flask_login import current_user, login_required
 from app.term.helpers import get_ark_id
+from app.term.models import Tag, TermSet
 
 
 @io.route("/upload", methods=["GET", "POST"])
@@ -17,6 +18,7 @@ def import_document():
     #                         for t in Tag.query.order_by(Tag.value)]
 
     if form.validate_on_submit():
+        term_dict = None
         uploaded_file = form.data_file.data
         set_name = form.name.data
         set_description = form.description.data
@@ -42,7 +44,7 @@ def import_document():
             flash("File type not supported", "danger")
             return redirect(url_for('io.import_document'))
 
-        return process_owl_upload(uploaded_file, new_tag)
+        return render_template("io/display_import.jinja", selected_terms=term_dict)
 
     else:
         # Debugging: Print form errors

@@ -5,20 +5,20 @@ YAMZ Import Terms
 {% endblock %}
 
 {% block headline %}
-Test upload json
+Test upload OWL
 {% endblock headline %}
 
 {% block content %}
 <p>
 
 {% for term in selected_terms %}
-    term: {{term['Term']}}<br>
-    definition: {{term['Definition']}}
-    example: {{term['Example']}}<p>
+    term: {{term['term']}}<br>
+    definition: {{term['definition']}}<br>
+    example: {{term['examples']}}<p>
 {% endfor %}
    
 </p>
 
-
+  
 
 {% endblock content%}
