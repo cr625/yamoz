@@ -1,4 +1,5 @@
 from owlready2 import *
+from rdflib import Graph
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -28,24 +29,30 @@ def list_all_classes(ontology):
     return [cls.name for cls in ontology.classes()]
 
 
-def list_main_classes(ontology):
-    return [cls.name for cls in ontology.classes() if not cls.is_a]
-
-
-def list_immediate_subclasses(ontology, class_name):
-    cls = ontology[class_name]
-#    return [subcls.name for subcls in cls.subclasses()]
-
-
 onto = get_ontology("app/io/import/bfo.owl").load()
 
-if __name__ == "__main__":
-    user = get_user_by_email("christopher.b.rauch@gmail.com")
-    print("user", user.auth_id)
-    print(onto.base_iri)
-    # classes = list_all_classes(onto)
-    # print("Classes in the ontology:", classes)
-    # main_classes = list_main_classes(onto)
-    # print("Main classes in the ontology:", main_classes)
-    # immediate_subclasses = list_immediate_subclasses(onto, "Entity")
-    # print("Immediate subclasses of Entity:", immediate_subclasses)
+
+def get_class_by_name(class_name):
+    return onto.search(iri="*{}".format(class_name))[0]
+
+
+entity_class = onto.search(iri="*Entity")[0]
+
+# Find the class that is a subclass of owl:Thing
+
+
+def find_class_is_a_thing(ontology):
+    for cls in ontology.classes():
+        if Thing in cls.is_a:
+            return cls
+    return None
+
+
+# Get the class that is a subclass of owl:Thing
+class_is_a_thing = find_class_is_a_thing(onto)
+
+if class_is_a_thing:
+    print(
+        f"The class that is a subclass of owl:Thing is: {class_is_a_thing.name}")
+else:
+    print("No class found that is a subclass of owl:Thing.")

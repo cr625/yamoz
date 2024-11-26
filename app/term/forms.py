@@ -64,5 +64,5 @@ class AddPropertyForm(FlaskForm):
     predicate_id = SelectField("Predicate", validators=[
         DataRequired()], choices=[])
     object_id = StringField("Object", validators=[DataRequired()])
-    subject_definition = PageDownField("Subject Definition")
     submit = SubmitField("Submit")
+# create a select list for set to list the terms for this set

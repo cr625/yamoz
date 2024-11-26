@@ -9,7 +9,7 @@ from flask_login import login_required
 @term.route("tag/create", methods=["GET", "POST"])
 def create_tag():
     # Default categories
-    default_categories = {"community", "source", "ontology", "portal"}
+    default_categories = {"community", "source", "ontology", "portal", "set"}
 
     # Check and add default categories if not present
     for category in default_categories:

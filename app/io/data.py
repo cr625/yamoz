@@ -18,8 +18,8 @@ def process_csv_upload(data_file):
     return csv_dataframe.to_dict(orient="records")
 
 
-def process_owl_upload(data_file):
-    pass
+def process_owl_upload(data_file, set_tag):
+    return data_file.filename + " " + set_tag.value
 
 
 def import_term_dict(term_dict, term_set):

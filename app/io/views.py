@@ -4,7 +4,7 @@ from app.io import io_blueprint as io
 from app.io.data import *
 from app.io.forms import DataFileUploadForm, EmptyForm
 from app.term.models import TermSet, Tag
-from flask import render_template, request, send_file, current_app
+from flask import render_template, request, send_file, current_app, flash, redirect, url_for
 from flask_login import current_user, login_required
 from app.term.helpers import get_ark_id
 
@@ -13,32 +13,44 @@ from app.term.helpers import get_ark_id
 @login_required
 def import_document():
     form = DataFileUploadForm()
+    # form.tag_list.choices = [(t.id, t.value)
+    #                         for t in Tag.query.order_by(Tag.value)]
+
     if form.validate_on_submit():
         uploaded_file = form.data_file.data
         set_name = form.name.data
         set_description = form.description.data
         owner_id = current_user.id
-        new_set = TermSet(
-            user_id=owner_id,
-            source="upload",
-            name=set_name,
-            description=set_description,
-        )
-        new_set.save()
-        db.session.refresh(new_set)
-        if (uploaded_file.filename.endswith(".json")):
+
+        new_tag = None
+        if form.new_tag.data:
+            new_tag = Tag.query.filter_by(
+                category="set", value=form.new_tag.data).first()
+            if not new_tag:
+                new_tag = Tag(value=form.new_tag.data, category="set")
+                db.session.add(new_tag)
+                db.session.commit()
+                db.session.refresh(new_tag)
+
+        if uploaded_file.filename.endswith(".json"):
             term_dict = process_json_upload(uploaded_file)
-        else:
+        elif uploaded_file.filename.endswith(".csv"):
             term_dict = process_csv_upload(uploaded_file)
-        term_set = import_term_dict(term_dict, new_set)
-        term_list = term_set.terms
-        return render_template(
-            "io/import_results.jinja",
-            selected_terms=term_list,
-            title=set_name,
-            description=set_description,
-            form=EmptyForm(),
-        )
+        elif uploaded_file.filename.endswith(".owl"):
+            term_dict = process_owl_upload(uploaded_file, new_tag)
+        else:
+            flash("File type not supported", "danger")
+            return redirect(url_for('io.import_document'))
+
+        return process_owl_upload(uploaded_file, new_tag)
+
+    else:
+        # Debugging: Print form errors
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(
+                    f"Error in the {getattr(form, field).label.text} field - {error}", "danger")
+
     return render_template("io/import_document.jinja", form=form)
 
 
@@ -59,8 +71,6 @@ def export_term_results():
 
 def process_json_upload(data_file):
     json_dataframe = pandas.read_json(data_file)
-    # standardize the names of the columns in Terms to lowercase
-    # https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.rename.html
     return json_dataframe["Terms"]
 
 

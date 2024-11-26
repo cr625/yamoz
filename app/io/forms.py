@@ -10,10 +10,11 @@ class DataFileUploadForm(FlaskForm):
     data_file = FileField(
         "data_file",
         validators=[FileRequired(), FileAllowed(
-            ["csv", "json"], "CSV or JSON only!")]
+            ["csv", "json", "owl"], "CSV, JSON or OWL are supported.")]
     )
-    tag_list = SelectField(
-        "Tag", choices=["a", "b", "c"], default="heliophysics")
+
+    # tag_list = SelectField("Tag", choices=[], default="set")
+    new_tag = StringField("Set Tag")
 
     submit = SubmitField("Upload")
 
