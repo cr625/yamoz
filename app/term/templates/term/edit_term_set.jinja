@@ -1,0 +1,18 @@
+{% extends './base.jinja' %}
+
+{% block title %}
+Edit Term Set
+{% endblock %}
+
+{% block headline %}
+Edit Term Set: {{ term_set.name }}
+{% endblock headline %}
+
+{% block content %}
+<form action="{{ url_for('term.edit_term_set', term_set_id=term_set.id) }}" method="post">
+    {{ form.hidden_tag() }}
+    {% include 'term/_term_set_form_fields.jinja' %}
+</form>
+
+{% include 'term/_term_list.jinja' %}
+{% endblock content %}

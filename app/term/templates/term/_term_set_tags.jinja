@@ -1,0 +1,13 @@
+<div class="container px-4">
+    <div class="form-group row p-4">
+        <div class="col">
+        current tags
+            {% for tag in term_set.tags %}
+            <a href="{{ url_for('term.terms_by_tag_value', tag_value=tag.value) }}" role="button"
+                class="btn btn-outline-dark btn-sm">{{ tag.value }}</a>
+            <a href="{{ url_for('term.remove_tag', term_id=term_set.id, tag_id=tag.id) }}" role="button"
+                class="btn btn-close btn-sm" onclick="confirm('remove tag {{tag.value}}?')"></a>
+            {% endfor %}
+        </div>
+    </div>
+</div>

@@ -1,4 +1,5 @@
 from app import db
+from .termset import termset_tag_table
 
 
 class Tag(db.Model):
@@ -17,7 +18,12 @@ class Tag(db.Model):
         back_populates="tags",
         order_by="Term.term_string",
     )
-    # reference = db.Column(db.Text, unique=True)
+
+    termsets = db.relationship(
+        "TermSet",
+        secondary=termset_tag_table,
+        back_populates="tags",
+    )
 
     def save(self):
         db.session.add(self)

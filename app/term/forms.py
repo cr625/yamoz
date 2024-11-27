@@ -1,8 +1,10 @@
+from wtforms import StringField, TextAreaField, SelectField, SubmitField
 from flask import request
 from flask_wtf import FlaskForm
 from wtforms import SubmitField, StringField, TextAreaField, SelectField, BooleanField
 from wtforms.validators import DataRequired
 from flask_pagedown.fields import PageDownField
+from app.term.models import Tag
 
 
 class CreateTermForm(FlaskForm):
@@ -65,4 +67,16 @@ class AddPropertyForm(FlaskForm):
         DataRequired()], choices=[])
     object_id = StringField("Object", validators=[DataRequired()])
     submit = SubmitField("Submit")
-# create a select list for set to list the terms for this set
+
+
+class EditTermSetForm(FlaskForm):
+    name = StringField("Name", validators=[DataRequired()])
+    description = TextAreaField("Description")
+    tag_list = SelectField("Tags", choices=[], coerce=int)
+    source = StringField("Source")
+    submit = SubmitField("Save")
+
+    def __init__(self, *args, **kwargs):
+        super(EditTermSetForm, self).__init__(*args, **kwargs)
+        self.tag_list.choices = [(tag.id, tag.value)
+                                 for tag in Tag.query.order_by(Tag.value).all()]

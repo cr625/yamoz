@@ -9,6 +9,7 @@ from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from app import db
+from app.term.models.track import Track
 from app.user.models import User
 from config import Config
 

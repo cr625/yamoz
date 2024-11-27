@@ -1,6 +1,12 @@
 
 from app import db
 
+termset_tag_table = db.Table(
+    "termset_tags",
+    db.Column("termset_id", db.Integer, db.ForeignKey("termsets.id")),
+    db.Column("tag_id", db.Integer, db.ForeignKey("tags.id")),
+)
+
 
 class TermSet(db.Model):
     __tablename__ = "termsets"
@@ -25,6 +31,12 @@ class TermSet(db.Model):
     )
 
     ark = db.relationship("Ark", backref="termsets", uselist=False)
+
+    tags = db.relationship(
+        "Tag",
+        secondary=termset_tag_table,
+        back_populates="termsets",
+    )
 
     @property
     def ark_concept_id(self):

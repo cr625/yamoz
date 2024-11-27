@@ -1,0 +1,13 @@
+<div class="form-group row py-2">
+    <div class="col-sm-9">
+        <form action="{{ url_for('term.add_tag', term_id=term_set.id) }}" method="post" class="form-inline">
+            {{ tag_form.hidden_tag() }}
+            <div class="input-group">
+                {{ tag_form.tag_list(class_="form-select form-select-sm me-2") }}
+                <div class="input-group-append">
+                    {{ tag_form.submit(class_="btn btn-dark btn-sm") }}
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

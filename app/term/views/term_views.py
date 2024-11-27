@@ -1,22 +1,15 @@
+from flask import (abort, current_app, flash, g, redirect, render_template,
+                   request, session, url_for)
+from flask_login import current_user, login_required
+
+from app.admin.term import status
+from app.extras import pretty
 from app.term import term_blueprint as term
 from app.term.forms import *
 from app.term.models import *
-from app.term.views.tag_views import create_tag
 from app.term.views.list_views import *
+from app.term.views.tag_views import create_tag
 from app.utilities import *
-from app.extras import pretty
-from flask import (
-    abort,
-    current_app,
-    flash,
-    g,
-    redirect,
-    render_template,
-    request,
-    url_for,
-    session,
-)
-from flask_login import current_user, login_required
 
 
 @term.before_request
@@ -232,9 +225,6 @@ def delete_term(concept_id):
     return redirect(url_for("term.list_terms"))
 
 
-# here we are using term id because the key is better as an integer and we don't have to look it up
-# we should probably decide if we are going to use the concept id or the term id
-# for now it has to be like this because of the seaice db schema
 @term.route("comment/<term_id>", methods=["POST"])
 @login_required
 def add_comment(term_id):
@@ -320,6 +310,22 @@ def display_term_set(term_set_id):
         term_set=term_set,
         form=EmptyForm(),
     )
+
+
+@term.route("/set/edit/<int:term_set_id>", methods=["GET", "POST"])
+@login_required
+def edit_term_set(term_set_id):
+    term_set = TermSet.query.get_or_404(term_set_id)
+    form = EditTermSetForm(obj=term_set)
+    tag_form = AddTagForm()
+    tag_form.tag_list.choices = [(tag.id, tag.value)
+                                 for tag in Tag.query.order_by(Tag.value).all()]
+    if form.validate_on_submit():
+        form.populate_obj(term_set)
+        db.session.commit()
+        flash("Term set updated.")
+        return redirect(url_for("term.display_term_set", term_set_id=term_set_id))
+    return render_template("term/edit_term_set.jinja", form=form, term_set=term_set, tag_form=tag_form)
 
 
 @term.route("track/<concept_id>", methods=["POST"])
