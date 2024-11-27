@@ -1,8 +1,9 @@
-from app.term import term_blueprint as term
-from app.term.models import Term, Tag, Relationship, Ark
-from app.term.forms import AddPropertyForm
-from flask import render_template, redirect, url_for, flash, request
+from flask import flash, redirect, render_template, url_for
 from flask_login import login_required
+
+from app.term import term_blueprint as term
+from app.term.forms import AddPropertyForm
+from app.term.models import Ark, Relationship, Tag, Term
 
 
 @term.route("/property", methods=["GET", "POST"])

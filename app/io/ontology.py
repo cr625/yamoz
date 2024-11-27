@@ -30,7 +30,7 @@ class OwlHandler:
 
 
 # Example usage:
-handler = OwlHandler("app/io/import/bfo.owl")
-terms = handler.get_ontology_terms()
-for term in terms:
-    print(term)
+# handler = OwlHandler("app/io/import/bfo.owl")
+# terms = handler.get_ontology_terms()
+# for term in terms:
+#    print(term)

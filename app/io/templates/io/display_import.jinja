@@ -9,15 +9,14 @@ Test upload OWL
 {% endblock headline %}
 
 {% block content %}
-<p>
-
+<div>
 {% for term in selected_terms %}
     term: {{term['term']}}<br>
     definition: {{term['definition']}}<br>
-    example: {{term['examples']}}<p>
+    examples: {{term['examples']}}<p>
 {% endfor %}
    
-</p>
+<div>
 
   
 

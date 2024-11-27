@@ -212,6 +212,7 @@ class Term(db.Model):
         cascade="all, delete-orphan",
     )
 
+    """
     @staticmethod
     def on_changed_definition(target, value, oldvalue, initiator):
         target.definition_html = bleach.linkify(
@@ -227,6 +228,7 @@ class Term(db.Model):
                 markdown(value, output_format="html"), tags=allowed_tags, strip=True
             )
         )
+    """
 
     def add_child_relationship(self, child, predicate):
         child = Relationship(
@@ -536,10 +538,10 @@ tag_table = db.Table(
     db.Column("term_id", db.Integer, db.ForeignKey("terms.id")),
 )
 
-
+"""
 db.event.listen(Term.definition, "set", Term.on_changed_definition)
 db.event.listen(Term.examples, "set", Term.on_changed_examples)
-
+"""
 set_table = db.Table(
     "term_sets",
     db.Model.metadata,
@@ -551,7 +553,8 @@ set_table = db.Table(
 class TermSet(db.Model):
     __tablename__ = "termsets"
     id = db.Column(db.Integer, primary_key=True)
-    ark_id = db.Column(db.Integer, nullable=True, unique=True)
+    ark_id = db.Column(db.Integer, db.ForeignKey(
+        "arks.id"), nullable=True, unique=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
     source = db.Column(db.Text)
     name = db.Column(db.Text)

@@ -18,13 +18,18 @@ def process_csv_upload(data_file):
     return csv_dataframe.to_dict(orient="records")
 
 
-def process_owl_upload(data_file, set_tag):
+def process_json_upload(data_file):
+    json_dataframe = pandas.read_json(data_file)
+    return json_dataframe["Terms"]
+
+
+def process_owl_upload(data_file):
     handler = OwlHandler("app/io/import/bfo.owl")
     terms = handler.get_ontology_terms()
     return terms
 
 
-def import_term_dict(term_dict, term_set):
+def import_term_dict(term_dict, term_set, new_tag):
     for term in term_dict:
         term_string = term["term"]
         definition = term["definition"]
@@ -49,11 +54,11 @@ def import_term_dict(term_dict, term_set):
         db.session.add(new_term)
         db.session.commit()
         db.session.refresh(new_term)
-        # term_list.append(new_term)
+        if new_tag:
+            new_term.tags.append(new_tag)
         term_set.terms.append(new_term)
-        term_set.save()
+    term_set.save()
     return term_set
-    # return term_list
 
 
 def import_helio_term_dict(term_dict, term_set, tag):

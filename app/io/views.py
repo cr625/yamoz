@@ -1,13 +1,11 @@
-from flask import (current_app, flash, redirect, render_template, request,
-                   send_file, url_for)
+from flask import flash, redirect, render_template, request, send_file, url_for
 from flask_login import current_user, login_required
 
 from app import db
 from app.io import io_blueprint as io
 from app.io.data import *
 from app.io.forms import DataFileUploadForm, EmptyForm
-from app.term.helpers import get_ark_id
-from app.term.models import Tag, TermSet
+from app.term.models import Ark, Tag, TermSet
 
 
 @io.route("/upload", methods=["GET", "POST"])
@@ -18,7 +16,7 @@ def import_document():
     #                         for t in Tag.query.order_by(Tag.value)]
 
     if form.validate_on_submit():
-        term_dict = None
+        imported_terms = None
         uploaded_file = form.data_file.data
         set_name = form.name.data
         set_description = form.description.data
@@ -35,16 +33,30 @@ def import_document():
                 db.session.refresh(new_tag)
 
         if uploaded_file.filename.endswith(".json"):
-            term_dict = process_json_upload(uploaded_file)
+            imported_terms = process_json_upload(uploaded_file)
         elif uploaded_file.filename.endswith(".csv"):
-            term_dict = process_csv_upload(uploaded_file)
+            imported_terms = process_csv_upload(uploaded_file)
         elif uploaded_file.filename.endswith(".owl"):
-            term_dict = process_owl_upload(uploaded_file, new_tag)
+            imported_terms = process_owl_upload(uploaded_file)
         else:
             flash("File type not supported", "danger")
             return redirect(url_for('io.import_document'))
 
-        return render_template("io/display_import.jinja", selected_terms=term_dict)
+        if imported_terms:
+            term_set = TermSet(
+                source=uploaded_file.filename,
+                description=set_description,
+                user_id=owner_id,
+                name=set_name,
+                ark_id=Ark().create_ark(shoulder="g1", naan="13183").id
+            )
+            term_set.save()
+            db.session.refresh(term_set)
+
+            imported_termset = import_term_dict(
+                imported_terms, term_set, new_tag)
+
+        return render_template("io/display_import.jinja", selected_terms=imported_termset.terms)
 
     else:
         # Debugging: Print form errors
