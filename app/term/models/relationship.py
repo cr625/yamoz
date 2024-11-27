@@ -1,6 +1,7 @@
-from app import db
-from sqlalchemy.ext.hybrid import hybrid_property
 from rdflib import URIRef
+from sqlalchemy.ext.hybrid import hybrid_property
+
+from app import db
 
 
 class Relationship(db.Model):

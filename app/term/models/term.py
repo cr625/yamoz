@@ -382,40 +382,6 @@ class Comment(db.Model):
         db.session.commit()
 
 
-class Tag(db.Model):
-    __tablename__ = "tags"
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
-    timestamp = db.Column(db.DateTime, default=db.func.now())
-    category = db.Column(db.Text, default="user")
-    value = db.Column(db.Text)
-    description = db.Column(db.Text)
-    domain = db.Column(db.Text)
-
-    terms = db.relationship(
-        "Term",
-        secondary="term_tags",
-        back_populates="tags",
-        order_by="Term.term_string",
-    )
-    # reference = db.Column(db.Text, unique=True)
-
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    #    def __init__(self, *args, **kwargs):
-    #        super(Tag, self).__init__(*args, **kwargs)
-    #        self.reference = normalize_tag(self.name + "#" + self.value)
-
-    def __repr__(self):
-        return "<Tag {} {}>".format(self.category, self.value)
-
-
 class Track(db.Model):
     __tablename__ = "tracking"
     user_id = db.Column(db.Integer, db.ForeignKey(
@@ -469,34 +435,3 @@ set_table = db.Table(
     db.Column("set_id", db.Integer, db.ForeignKey("termsets.id")),
     db.Column("term_id", db.Integer, db.ForeignKey("terms.id")),
 )
-
-
-class TermSet(db.Model):
-    __tablename__ = "termsets"
-    id = db.Column(db.Integer, primary_key=True)
-    ark_id = db.Column(db.Integer, db.ForeignKey(
-        "arks.id"), nullable=True, unique=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
-    source = db.Column(db.Text)
-    name = db.Column(db.Text)
-    description = db.Column(db.Text)
-    created = db.Column(db.DateTime, default=db.func.now())
-    updated = db.Column(db.DateTime, default=db.func.now(),
-                        onupdate=db.func.now())
-
-    terms = db.relationship(
-        "Term",
-        secondary="term_sets",
-        back_populates="termsets",
-        order_by="Term.term_string",
-        single_parent=True,
-        cascade="all, delete-orphan",
-    )
-
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
