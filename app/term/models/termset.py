@@ -24,6 +24,12 @@ class TermSet(db.Model):
         cascade="all, delete-orphan",
     )
 
+    ark = db.relationship("Ark", backref="termsets", uselist=False)
+
+    @property
+    def ark_concept_id(self):
+        return self.ark.concept_id if self.ark else None
+
     def save(self):
         db.session.add(self)
         db.session.commit()

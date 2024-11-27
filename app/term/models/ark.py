@@ -37,5 +37,9 @@ class Ark(db.Model):
         db.session.commit()
         return new_ark
 
+    @property
+    def full_ark(self):
+        return f"{self.naan}/{self.shoulder}{self.ark_id}"
+
     def __repr__(self):
         return f"<Ark {self.shoulder}{self.ark_id}>"

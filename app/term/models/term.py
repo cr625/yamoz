@@ -14,7 +14,6 @@ from config import Config
 
 from .relationship import Relationship
 
-
 SHOULDER = Config.SHOULDER
 NAAN = Config.NAAN
 
@@ -400,7 +399,8 @@ set_table = db.Table(
 
 
 '''
-This attaches signals to the Term model. Signals are used to trigger notifications and actions in response to changes in the database.
+This attaches signals to the Term model. Signals are used to trigger
+notifications and actions in response to changes in the database.
 '''
 term_signals = Namespace()
 
