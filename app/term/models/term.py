@@ -1,11 +1,9 @@
 import enum
 import re
-from email.policy import default
 
 import bleach
 from blinker import Namespace
 from markdown import markdown
-from rdflib import URIRef
 from sqlalchemy import Index, case, select
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -15,6 +13,7 @@ from app.user.models import User
 from config import Config
 
 from .relationship import Relationship
+
 
 SHOULDER = Config.SHOULDER
 NAAN = Config.NAAN
@@ -56,19 +55,6 @@ class status(enum.Enum):
     published = (2, "published")
     draft = (3, "draft")
     deleted = (4, "deleted")
-
-
-'''
-This attaches signals to the Term model. Signals are used to trigger notifications and actions in response to changes in the database.
-'''
-term_signals = Namespace()
-
-term_saved = term_signals.signal("term_saved")
-term_deleted = term_signals.signal("term_deleted")
-term_updated = term_signals.signal("term_updated")
-term_commented = term_signals.signal("term_commented")
-term_tracked = term_signals.signal("term_tracked")
-term_voted = term_signals.signal("term_voted")
 
 
 class Term(db.Model):
@@ -132,24 +118,6 @@ class Term(db.Model):
         lazy="dynamic",
         cascade="all, delete-orphan",
     )
-
-    """
-    @staticmethod
-    def on_changed_definition(target, value, oldvalue, initiator):
-        target.definition_html = bleach.linkify(
-            bleach.clean(
-                markdown(value, output_format="html"), tags=allowed_tags, strip=True
-            )
-        )
-
-    @staticmethod
-    def on_changed_examples(target, value, oldvalue, initiator):
-        target.examples_html = bleach.linkify(
-            bleach.clean(
-                markdown(value, output_format="html"), tags=allowed_tags, strip=True
-            )
-        )
-    """
 
     def add_child_relationship(self, child, predicate):
         child = Relationship(
@@ -355,6 +323,24 @@ class Term(db.Model):
     def __repr__(self):
         return "<Term {} |{}>".format(self.term_string, self.concept_id)
 
+    """
+    @staticmethod
+    def on_changed_definition(target, value, oldvalue, initiator):
+        target.definition_html = bleach.linkify(
+            bleach.clean(
+                markdown(value, output_format="html"), tags=allowed_tags, strip=True
+            )
+        )
+
+    @staticmethod
+    def on_changed_examples(target, value, oldvalue, initiator):
+        target.examples_html = bleach.linkify(
+            bleach.clean(
+                markdown(value, output_format="html"), tags=allowed_tags, strip=True
+            )
+        )
+    """
+
 
 class Comment(db.Model):
     __tablename__ = "comments"
@@ -382,29 +368,6 @@ class Comment(db.Model):
         db.session.commit()
 
 
-class Track(db.Model):
-    __tablename__ = "tracking"
-    user_id = db.Column(db.Integer, db.ForeignKey(
-        "users.id"), primary_key=True)
-    term_id = db.Column(db.Integer, db.ForeignKey(
-        "terms.id"), primary_key=True)
-
-    term = db.relationship("Term", back_populates="tracks",
-                           order_by="Term.term_string")
-    user = db.relationship("User", back_populates="tracking")
-
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    def __repr__(self) -> str:
-        return self.user.last_name + ": " + self.term.term_string
-
-
 class Vote(db.Model):
     __tablename__ = "votes"
     user_id = db.Column(db.Integer, db.ForeignKey(
@@ -418,6 +381,9 @@ class Vote(db.Model):
         db.session.commit()
 
 
+"""
+Association Tables
+"""
 tag_table = db.Table(
     "term_tags",
     db.Model.metadata,
@@ -425,13 +391,28 @@ tag_table = db.Table(
     db.Column("term_id", db.Integer, db.ForeignKey("terms.id")),
 )
 
-"""
-db.event.listen(Term.definition, "set", Term.on_changed_definition)
-db.event.listen(Term.examples, "set", Term.on_changed_examples)
-"""
 set_table = db.Table(
     "term_sets",
     db.Model.metadata,
     db.Column("set_id", db.Integer, db.ForeignKey("termsets.id")),
     db.Column("term_id", db.Integer, db.ForeignKey("terms.id")),
 )
+
+
+'''
+This attaches signals to the Term model. Signals are used to trigger notifications and actions in response to changes in the database.
+'''
+term_signals = Namespace()
+
+term_saved = term_signals.signal("term_saved")
+term_deleted = term_signals.signal("term_deleted")
+term_updated = term_signals.signal("term_updated")
+term_commented = term_signals.signal("term_commented")
+term_tracked = term_signals.signal("term_tracked")
+term_voted = term_signals.signal("term_voted")
+
+"""
+DB Event Listeners
+"""
+# db.event.listen(Term.definition, "set", Term.on_changed_definition)
+# db.event.listen(Term.examples, "set", Term.on_changed_examples)
