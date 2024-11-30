@@ -16,13 +16,14 @@ Termset: {{ term_set.name}}
     <br>
     {{ term_set.ark_concept_id}}
 </p>
+
+{% include 'term/_term_set_tags.jinja' %}
+<div class="text-start" style="max-width: 800px;">
+{% include 'term/_tag_selection.jinja' %}
+</div>
 <hr>
 
-{% for term in term_set.terms  %}
-<a href="{{ url_for('term.display_term', concept_id=term.concept_id) }}">{{ term.term_string }}</a><br>
 
-{% endfor %}
-
-
+{% include 'term/_term_list.jinja' %}
 
 {% endblock content%}

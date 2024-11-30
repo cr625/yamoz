@@ -1,7 +1,7 @@
 <div class="container px-4">
     <div class="form-group row p-4">
         <div class="col">
-        current tags
+        Termset tags
             {% for tag in term_set.tags %}
             <a href="{{ url_for('term.terms_by_tag_value', tag_value=tag.value) }}" role="button"
                 class="btn btn-outline-dark btn-sm">{{ tag.value }}</a>
