@@ -5,8 +5,10 @@
             {% for tag in term_set.tags %}
             <a href="{{ url_for('term.terms_by_tag_value', tag_value=tag.value) }}" role="button"
                 class="btn btn-outline-dark btn-sm">{{ tag.value }}</a>
-            <a href="{{ url_for('term.remove_tag', term_id=term_set.id, tag_id=tag.id) }}" role="button"
-                class="btn btn-close btn-sm" onclick="confirm('remove tag {{tag.value}}?')"></a>
+            <form action="{{ url_for('term.remove_tag_from_term_set', term_set_id=term_set.id, tag_id=tag.id) }}"
+                method="post" class="d-inline">
+                {{ form.hidden_tag() }}
+                <button type="submit" class="btn btn-close btn-sm" onclick="confirm('remove tag {{tag.value}}?')"></button>
             {% endfor %}
         </div>
     </div>

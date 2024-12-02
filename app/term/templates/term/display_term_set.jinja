@@ -9,21 +9,33 @@ Termset: {{ term_set.name}}
 {% endblock headline %}
 
 {% block content %}
-<p>
-    {{ term_set.description }}
-    <br>
-    created {{ term_set.created }}
-    <br>
-    {{ term_set.ark_concept_id}}
-</p>
+<div class="card">
+    <div class="card-body">
+        <p>
+            {{ term_set.description }}
+            <br>
+            created {{ term_set.created }}
+            <br>
+            {{ term_set.ark_concept_id}}
+        </p>
+        <div class="d-flex justify-content-end">
+            <form action="{{ url_for('term.edit_term_set', term_set_id=term_set.id) }}" method="get" class="me-2">
+                <button type="submit" class="btn btn-dark">Edit</button>
+            </form>
+            <form action="{{ url_for('term.delete_term_set', term_set_id=term_set.id) }}" method="post">
+            
+                <button type="submit" class="btn btn-dark">Delete</button>
+            </form>
+        </div>
+    </div>
+</div>
 
 {% include 'term/_term_set_tags.jinja' %}
 <div class="text-start" style="max-width: 800px;">
-{% include 'term/_tag_selection.jinja' %}
+{% include 'term/_term_set_tag_selection.jinja' %}
 </div>
 <hr>
 
-
 {% include 'term/_term_list.jinja' %}
 
-{% endblock content%}
+{% endblock content %}

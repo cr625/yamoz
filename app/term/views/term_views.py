@@ -296,59 +296,6 @@ def list_terms():
     return redirect(url_for("term.list_top_terms_alphabetical"))
 
 
-@term.route("/set/list")
-def list_term_sets():
-    term_sets = TermSet.query.order_by(TermSet.name)
-    return render_template("term/list_term_sets.jinja", term_sets=term_sets)
-
-
-@term.route("/set/display/<int:term_set_id>")
-def display_term_set(term_set_id):
-    term_set = TermSet.query.get_or_404(term_set_id)
-    tag_form = AddTagForm()
-    tag_form.tag_list.choices = [(tag.id, tag.value)
-                                 for tag in Tag.query.order_by(Tag.value).all()]
-    return render_template(
-        "term/display_term_set.jinja",
-        term_set=term_set,
-        form=EmptyForm(),
-        tag_form=tag_form,
-    )
-
-
-@term.route("/set/edit/<int:term_set_id>", methods=["GET", "POST"])
-@login_required
-def edit_term_set(term_set_id):
-    term_set = TermSet.query.get_or_404(term_set_id)
-    form = EditTermSetForm(obj=term_set)
-    tag_form = AddTagForm()
-    tag_form.tag_list.choices = [(tag.id, tag.value)
-                                 for tag in Tag.query.order_by(Tag.value).all()]
-    if form.validate_on_submit():
-        form.populate_obj(term_set)
-        db.session.commit()
-        flash("Term set updated.")
-        return redirect(url_for("term.display_term_set", term_set_id=term_set_id))
-
-    return render_template("term/edit_term_set.jinja", form=form, term_set=term_set, tag_form=tag_form)
-
-
-@term.route("/set/add_tag/<int:term_set_id>", methods=["POST"])
-@login_required
-def add_tag_to_term_set(term_set_id):
-    term_set = TermSet.query.get_or_404(term_set_id)
-    tag_form = AddTagForm()
-    tag_form.tag_list.choices = [(tag.id, tag.value)
-                                 for tag in Tag.query.order_by(Tag.value).all()]
-    if tag_form.validate_on_submit():
-        tag = Tag.query.get(tag_form.tag_list.data)
-        if tag not in term_set.tags:
-            term_set.tags.append(tag)
-            db.session.commit()
-            flash("Tag added.")
-    return redirect(url_for("term.display_term_set", term_set_id=term_set_id))
-
-
 @term.route("track/<concept_id>", methods=["POST"])
 @login_required
 def track_term(concept_id):
