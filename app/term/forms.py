@@ -21,7 +21,7 @@ class CommentForm(FlaskForm):
 
 
 class EmptyForm(FlaskForm):
-    submit = SubmitField("Submit")
+    submit = SubmitField("")
 
 
 class SearchForm(FlaskForm):
@@ -57,7 +57,7 @@ class EditTagForm(FlaskForm):
 
 
 class AddTagForm(FlaskForm):
-    tag_list = SelectField("Tag")
+    tag_list = SelectField("Tag", choices=[])
     submit = SubmitField("Apply Tag")
 
 

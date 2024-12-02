@@ -35,8 +35,7 @@ def edit_term_set(term_set_id):
     term_set = TermSet.query.get_or_404(term_set_id)
     form = EditTermSetForm(obj=term_set)
     tag_form = AddTagForm()
-    tag_form.tag_list.choices = [(tag.id, tag.value)
-                                 for tag in Tag.query.order_by(Tag.value).all()]
+
     if form.validate_on_submit():
         form.populate_obj(term_set)
         db.session.commit()
@@ -64,20 +63,30 @@ def delete_term_set(term_set_id):
 def add_tag_to_term_set(term_set_id):
     term_set = TermSet.query.get_or_404(term_set_id)
     tag_form = AddTagForm()
-    tag_form.tag_list.choices = [(tag.id, tag.value)
-                                 for tag in Tag.query.order_by(Tag.value).all()]
+    tag_form.tag_list.choices = [('', 'Select a tag')] + [(tag.id, tag.value)
+                                                          for tag in Tag.query.order_by(Tag.value).all()]
+
     if tag_form.validate_on_submit():
-        tag = Tag.query.get(tag_form.tag_list.data)
-        if tag not in term_set.tags:
-            term_set.tags.append(tag)
-            db.session.commit()
-            flash("Tag added.")
+        if tag_form.tag_list.data == '':
+            flash("Please select a valid tag.")
+        else:
+            tag = Tag.query.get(tag_form.tag_list.data)
+            if tag:
+                if tag not in term_set.tags:
+                    term_set.tags.append(tag)
+                    db.session.commit()
+                    flash("Tag added.")
+                else:
+                    flash("Tag already exists in the term set.")
+            else:
+                flash("Invalid tag selected.")
     return redirect(url_for("term.display_term_set", term_set_id=term_set_id))
 
 
 @term.route("/set/remove_tag/<int:term_set_id>/<int:tag_id>", methods=["POST"])
 @login_required
 def remove_tag_from_term_set(term_set_id, tag_id):
+    form = EmptyForm()
     term_set = TermSet.query.get_or_404(term_set_id)
     tag = Tag.query.get_or_404(tag_id)
     if tag in term_set.tags:
