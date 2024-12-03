@@ -11,19 +11,35 @@ Termset: {{ term_set.name}}
 {% block content %}
 <div class="card">
     <div class="card-body">
-        <p>
-            {{ term_set.description }}
-            <br>
-            created {{ term_set.created }}
-            <br>
-            {{ term_set.ark_concept_id}}
-        </p>
-        <div class="d-flex justify-content-end">
+        <div class="row mb-2">
+            <div class="col-auto" style="width: 120px;">
+                <label class="col-form-label"><em>Description:</em></label>
+            </div>
+            <div class="col">
+                <p class="form-control-plaintext mb-0">{{ term_set.description }}</p>
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-auto" style="width: 120px;">
+                <label class="col-form-label"><em>Created:</em></label>
+            </div>
+            <div class="col">
+                <p class="form-control-plaintext mb-0">{{ term_set.created }}</p>
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-auto" style="width: 120px;">
+                <label class="col-form-label"><em>ARK:</em></label>
+            </div>
+            <div class="col">
+                <p class="form-control-plaintext mb-0">ark:/{{ term_set.ark.full_ark }}</p>
+            </div>
+        </div>
+        <div class="d-flex justify-content-start">
             <form action="{{ url_for('term.edit_term_set', term_set_id=term_set.id) }}" method="get" class="me-2">
                 <button type="submit" class="btn btn-dark">Edit</button>
             </form>
             <form action="{{ url_for('term.delete_term_set', term_set_id=term_set.id) }}" method="post">
-            
                 <button type="submit" class="btn btn-dark">Delete</button>
             </form>
         </div>

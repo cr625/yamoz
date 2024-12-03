@@ -72,11 +72,13 @@ class AddPropertyForm(FlaskForm):
 class EditTermSetForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
     description = TextAreaField("Description")
-    tag_list = SelectField("Tags", choices=[], coerce=int)
+    # tag_list = SelectField("Tags", choices=[], coerce=int)
     source = StringField("Source")
     submit = SubmitField("Save")
 
+    '''
     def __init__(self, *args, **kwargs):
         super(EditTermSetForm, self).__init__(*args, **kwargs)
         self.tag_list.choices = [(tag.id, tag.value)
                                  for tag in Tag.query.order_by(Tag.value).all()]
+    '''

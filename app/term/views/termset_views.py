@@ -1,4 +1,4 @@
-from flask import (flash, redirect, render_template, url_for)
+from flask import (flash, redirect, render_template, url_for, request)
 from flask_login import current_user, login_required
 
 from app.term import term_blueprint as term
@@ -21,6 +21,7 @@ def display_term_set(term_set_id):
     tag_form = AddTagForm()
     tag_form.tag_list.choices = [(tag.id, tag.value)
                                  for tag in Tag.query.order_by(Tag.value).all()]
+
     return render_template(
         "term/display_term_set.jinja",
         term_set=term_set,
@@ -34,15 +35,21 @@ def display_term_set(term_set_id):
 def edit_term_set(term_set_id):
     term_set = TermSet.query.get_or_404(term_set_id)
     form = EditTermSetForm(obj=term_set)
-    tag_form = AddTagForm()
 
     if form.validate_on_submit():
         form.populate_obj(term_set)
         db.session.commit()
         flash("Term set updated.")
         return redirect(url_for("term.display_term_set", term_set_id=term_set_id))
+    else:
+        if request.method == "POST":
+            flash("Error: Form validation failed.")
+            for field, errors in form.errors.items():
+                for error in errors:
+                    flash(
+                        f"Error in {getattr(form, field).label.text}: {error}")
 
-    return render_template("term/edit_term_set.jinja", form=form, term_set=term_set, tag_form=tag_form)
+    return render_template("term/edit_term_set.jinja", form=form, term_set=term_set)
 
 
 @term.route("/set/delete/<int:term_set_id>", methods=["POST"])
