@@ -3,6 +3,7 @@ from flask_login import current_user
 from owlready2 import get_ontology
 
 from app.term.models import TermSet, Term, Relationship, Ark
+from app import db
 
 
 class OwlHandler:
@@ -70,16 +71,16 @@ class OntologyClassifier:
             return relationships
 
     def create_relationship(self, parent_term, child_term):
-        '''
+        # Check for existing relationships within the termset
         existing_relationship = Relationship.query.join(Term, Relationship.parent_id == Term.id).filter(
             Term.term_string == parent_term.term_string,
             Relationship.child_id == child_term.id,
-            Relationship.predicate_id == self.get_subclass_predicate_id()
+            Relationship.predicate_id == self.get_subclass_predicate_id(),
         ).first()
 
         if existing_relationship:
             return None
-        '''
+
         relationship = Relationship(
             parent_id=parent_term.id,
             child_id=child_term.id,
@@ -89,7 +90,11 @@ class OntologyClassifier:
         )
         # Add the relationship to the termset_relationships table
         self.term_set.relationships.append(relationship)
-        # Do not save the relationship to the database
+
+        # Save the relationship to the database
+        db.session.add(relationship)
+        db.session.commit()
+
         return relationship
 
     def find_term_by_string(self, term_string):

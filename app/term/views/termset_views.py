@@ -143,3 +143,21 @@ def test_ontology(term_set_id):
 
     flash("OntologyClassifier test completed.")
     return render_template("term/list_termset_relations.jinja", relationships=relationships)
+
+
+@term.route("/set/relationships/<int:term_set_id>")
+@login_required
+def list_termset_relationships(term_set_id):
+    term_set = TermSet.query.get_or_404(term_set_id)
+    relationships = term_set.relationships
+
+    # Fetch term strings for relationships
+    for relationship in relationships:
+        relationship.parent = Term.query.get(relationship.parent_id)
+        relationship.predicate = Term.query.get(relationship.predicate_id)
+        relationship.child = Term.query.get(relationship.child_id)
+        relationship.owner = User.query.get(relationship.owner_id)
+        relationship.ark = Ark.query.get(relationship.ark_id)
+        relationship.termset_name = term_set.name
+
+    return render_template("term/list_termset_relations.jinja", relationships=relationships)
