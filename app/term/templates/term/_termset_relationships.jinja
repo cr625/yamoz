@@ -6,15 +6,20 @@
             <th>Subject</th>
             <th>Predicate</th>
             <th>Object</th>
-            <th>Actions</th>
+            <th>Owner</th>
+            <th>ARK</th>
+            <th>Termset Name</th>
         </tr>
     </thead>
     <tbody>
         {% for relationship in relationships %}
         <tr>
-            <td>{{ relationship.parent.term_string }}</td>
-            <td>{{ relationship.predicate.term_string }}</td>
-            <td>{{ relationship.child.term_string }}</td>
+            <td><a href="{{ url_for('term.display_term', concept_id=relationship.parent.concept_id) }}">{{ relationship.parent.term_string }}</a></td>
+            <td><a href="{{ url_for('term.display_term', concept_id=relationship.predicate.concept_id) }}">{{ relationship.predicate.term_string }}</a></td>
+            <td><a href="{{ url_for('term.display_term', concept_id=relationship.child.concept_id) }}">{{ relationship.child.term_string }}</a></td>
+            <td>{{ relationship.owner.full_name }}</td>
+            <td>{{ relationship.ark.full_ark }}</td>
+            <td>{{ relationship.termset_name }}</td>
         </tr>
         {% endfor %}
     </tbody>
