@@ -26,11 +26,23 @@ def display_term_set(term_set_id):
     tag_form.tag_list.choices = [(tag.id, tag.value)
                                  for tag in Tag.query.order_by(Tag.value).all()]
 
+    relationships = term_set.relationships
+
+    # Fetch term strings for relationships
+    for relationship in relationships:
+        relationship.parent = Term.query.get(relationship.parent_id)
+        relationship.predicate = Term.query.get(relationship.predicate_id)
+        relationship.child = Term.query.get(relationship.child_id)
+        relationship.owner = User.query.get(relationship.owner_id)
+        relationship.ark = Ark.query.get(relationship.ark_id)
+        relationship.termset_name = term_set.name
+
     return render_template(
         "term/display_term_set.jinja",
         term_set=term_set,
         form=EmptyForm(),
         tag_form=tag_form,
+        relationships=relationships,
     )
 
 

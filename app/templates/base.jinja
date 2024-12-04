@@ -90,6 +90,9 @@
                         {% if session['portal_tag'] %}
                         {% else %}
                         <li class="nav-item">
+                            {{ macros.nav_link('term.list_term_sets', 'Sets') }}
+                        </li>
+                        <li class="nav-item">
                             {{ macros.nav_link('term.list_tags', 'Tags') }}
                         </li>
                         {% endif %}

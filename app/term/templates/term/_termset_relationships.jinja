@@ -1,0 +1,22 @@
+{# app/templates/partials/term_relationships.jinja #}
+{% if term_set.relationships %}
+<table class="table">
+    <thead>
+        <tr>
+            <th>Subject</th>
+            <th>Predicate</th>
+            <th>Object</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for relationship in relationships %}
+        <tr>
+            <td>{{ relationship.parent.term_string }}</td>
+            <td>{{ relationship.predicate.term_string }}</td>
+            <td>{{ relationship.child.term_string }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
