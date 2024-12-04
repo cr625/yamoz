@@ -6,9 +6,11 @@ from flask_login import current_user, login_required
 from app.term import term_blueprint as term
 from app.term.forms import *
 from app.term.models import *
+from app.user.models import User
 from app.term.views.list_views import *
 from app.term.views.tag_views import create_tag
 from app.utilities import *
+from app.io.ontology import OntologyClassifier
 
 
 @term.route("/set/list")
@@ -121,3 +123,23 @@ def download_file(filename):
     else:
         flash("File not found.")
         return redirect(url_for("term.list_terms"))
+
+
+@term.route("/set/test_ontology/<int:term_set_id>")
+@login_required
+def test_ontology(term_set_id):
+    term_set = TermSet.query.get_or_404(term_set_id)
+    classifier = OntologyClassifier(term_set)
+    relationships = classifier.create_relationships()
+
+    # Fetch term strings for relationships
+    for relationship in relationships:
+        relationship.parent = Term.query.get(relationship.parent_id)
+        relationship.predicate = Term.query.get(relationship.predicate_id)
+        relationship.child = Term.query.get(relationship.child_id)
+        relationship.owner = User.query.get(relationship.owner_id)
+        relationship.ark = Ark.query.get(relationship.ark_id)
+        relationship.termset_name = term_set.name
+
+    flash("OntologyClassifier test completed.")
+    return render_template("term/list_termset_relations.jinja", relationships=relationships)

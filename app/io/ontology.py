@@ -1,7 +1,8 @@
 import os
+from flask_login import current_user
 from owlready2 import get_ontology
 
-from app.term.models import TermSet, Term, Relationship
+from app.term.models import TermSet, Term, Relationship, Ark
 
 
 class OwlHandler:
@@ -49,39 +50,50 @@ class OntologyClassifier:
     def get_terms(self):
         return Term.query.filter(Term.termsets.contains(self.term_set)).all()
 
-    def refine_ontology(self):
+    def create_relationships(self):
         if self.source_file:
             handler = OwlHandler(self.source_file)
-            ontology_terms = handler.get_ontology_terms()
-            for term in self.terms:
-                for ontology_term in ontology_terms:
-                    if term.term_string == ontology_term['term']:
-                        term.definition = ontology_term['definition']
-                        term.examples = ontology_term['examples']
-                        term.save()
-            self.create_relationships(handler)
-
-    def create_relationships(self, handler):
-        for onto_class in handler.onto.classes():
-            term_string = onto_class.name
-            parent_classes = onto_class.is_a
-            for parent_class in parent_classes:
-                if parent_class.name != term_string:
-                    child_term = self.find_term_by_string(term_string)
-                    parent_term = self.find_term_by_string(parent_class.name)
-                    if child_term and parent_term:
-                        self.create_relationship(parent_term, child_term)
-
-    def find_term_by_string(self, term_string):
-        return Term.query.filter_by(term_string=term_string).first()
+            relationships = []
+            for onto_class in handler.onto.classes():
+                term_string = onto_class.name
+                parent_classes = onto_class.is_a
+                for parent_class in parent_classes:
+                    if parent_class.name != term_string:
+                        child_term = self.find_term_by_string(term_string)
+                        parent_term = self.find_term_by_string(
+                            parent_class.name)
+                        if child_term and parent_term:
+                            relationship = self.create_relationship(
+                                child_term, parent_term)  # reversed on purpose because we are looking for subclass relationships
+                            if relationship:
+                                relationships.append(relationship)
+            return relationships
 
     def create_relationship(self, parent_term, child_term):
+        '''
+        existing_relationship = Relationship.query.join(Term, Relationship.parent_id == Term.id).filter(
+            Term.term_string == parent_term.term_string,
+            Relationship.child_id == child_term.id,
+            Relationship.predicate_id == self.get_subclass_predicate_id()
+        ).first()
+
+        if existing_relationship:
+            return None
+        '''
         relationship = Relationship(
             parent_id=parent_term.id,
             child_id=child_term.id,
             predicate_id=self.get_subclass_predicate_id(),
+            ark_id=Ark().create_ark(shoulder="g1", naan="13183").id,
+            owner_id=current_user.id
         )
-        relationship.save()
+        # Add the relationship to the termset_relationships table
+        self.term_set.relationships.append(relationship)
+        # Do not save the relationship to the database
+        return relationship
+
+    def find_term_by_string(self, term_string):
+        return Term.query.filter_by(term_string=term_string).first()
 
     def get_subclass_predicate_id(self):
         subclass_predicate = Term.query.filter_by(

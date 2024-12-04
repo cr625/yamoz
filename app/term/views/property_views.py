@@ -1,5 +1,5 @@
 from flask import flash, redirect, render_template, url_for
-from flask_login import login_required
+from flask_login import current_user, login_required
 
 from app.term import term_blueprint as term
 from app.term.forms import AddPropertyForm
@@ -46,7 +46,8 @@ def add_property():
             parent_id=subject.id,
             predicate_id=predicate.id,
             child_id=object.id,
-            ark_id=ark.id
+            ark_id=ark.id,
+            owner_id=current_user.id
         )
         new_relationship.save()
 

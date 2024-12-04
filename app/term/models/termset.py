@@ -1,5 +1,6 @@
 
 from app import db
+from app.term.models.association_tables import termset_relationships
 
 termset_tag_table = db.Table(
     "termset_tags",
@@ -28,6 +29,12 @@ class TermSet(db.Model):
         order_by="Term.term_string",
         single_parent=True,
         cascade="all, delete-orphan",
+    )
+
+    relationships = db.relationship(
+        "Relationship",
+        secondary=termset_relationships,
+        back_populates="termsets",
     )
 
     ark = db.relationship("Ark", backref="termsets", uselist=False)
