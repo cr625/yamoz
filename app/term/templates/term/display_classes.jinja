@@ -1,0 +1,26 @@
+{% extends 'base.jinja' %}
+
+{% block title %}
+Taxonomy View
+{% endblock %}
+
+{% block content %}
+<h2>Taxonomy View</h2>
+<div id="taxonomy">
+    <ul>
+        {% macro render_node(node) %}
+            <li>
+                {{ node.name }}
+                {% if node.children %}
+                    <ul>
+                        {% for child in node.children %}
+                            {{ render_node(child) }}
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </li>
+        {% endmacro %}
+        {{ render_node(hierarchy) }}
+    </ul>
+</div>
+{% endblock %}

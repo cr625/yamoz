@@ -13,34 +13,34 @@
     <div class="card-body">
         <div class="row mb-2">
             <div class="col-auto" style="width: 120px;">
-                <label class="col-form-label"><em>Description:</em></label>
+                <em>Description:</em>
             </div>
             <div class="col">
-                <p class="form-control-plaintext mb-0">{{ term_set.description }}</p>
+                <p class="mb-0">{{ term_set.description }}</p>
             </div>
         </div>
         <div class="row mb-2">
             <div class="col-auto" style="width: 120px;">
-                <label class="col-form-label"><em>Created:</em></label>
+                <em>Created:</em>
             </div>
             <div class="col">
-                <p class="form-control-plaintext mb-0">{{ term_set.created }}</p>
+                <p class="mb-0">{{ term_set.created }}</p>
             </div>
         </div>
         <div class="row mb-2">
             <div class="col-auto" style="width: 120px;">
-                <label class="col-form-label"><em>ARK:</em></label>
+                <em>ARK:</em>
             </div>
             <div class="col">
-                <p class="form-control-plaintext mb-0">ark:/{{ term_set.ark.full_ark }}</p>
+                <p class="mb-0">ark:/{{ term_set.ark.full_ark }}</p>
             </div>
         </div>
         <div class="row mb-2">
             <div class="col-auto" style="width: 120px;">
-                <label class="col-form-label"><em>Source:</em></label>
+                <em>Source:</em>
             </div>
             <div class="col">
-                <p class="form-control-plaintext mb-0">
+                <p class="mb-0">
                     <a href="{{ url_for('term.download_file', filename=term_set.source) }}">{{ term_set.source }}</a>
                 </p>
             </div>

@@ -11,6 +11,7 @@ from app.term.views.list_views import *
 from app.term.views.tag_views import create_tag
 from app.utilities import *
 from app.io.ontology import OntologyClassifier
+import networkx as nx
 
 
 @term.route("/set/list")
@@ -173,3 +174,28 @@ def list_termset_relationships(term_set_id):
         relationship.termset_name = term_set.name
 
     return render_template("term/list_termset_relations.jinja", relationships=relationships)
+
+
+@term.route("/set/classes/<int:term_set_id>")
+def display_classes(term_set_id):
+    term_set = TermSet.query.get_or_404(term_set_id)
+    classifier = OntologyClassifier(term_set)
+    hierarchy = classifier.build_hierarchy()
+
+    # Identify a root node (a node with no incoming edges)
+    root = [node for node, degree in hierarchy.in_degree() if degree == 0]
+    if not root:
+        flash("No root node found for the hierarchy.")
+        return redirect(url_for("term.display_term_set", term_set_id=term_set_id))
+
+    # Convert the hierarchy to a nested dictionary format
+    def build_tree(node):
+        children = list(hierarchy.successors(node))
+        return {
+            "name": node,
+            "children": [build_tree(child) for child in children]
+        }
+
+    hierarchy_data = build_tree(root[0])
+
+    return render_template("term/display_classes.jinja", hierarchy=hierarchy_data, term_set=term_set)

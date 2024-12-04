@@ -5,6 +5,8 @@ from owlready2 import get_ontology
 from app.term.models import TermSet, Term, Relationship, Ark
 from app import db
 
+import networkx as nx
+
 
 class OwlHandler:
     def __init__(self, ontology_location):
@@ -50,6 +52,27 @@ class OntologyClassifier:
 
     def get_terms(self):
         return Term.query.filter(Term.termsets.contains(self.term_set)).all()
+
+    def build_relationships(self):
+        relationships = []
+        for relationship in self.term_set.relationships:
+            parent_term = Term.query.get(relationship.parent_id)
+            child_term = Term.query.get(relationship.child_id)
+            if parent_term and child_term:
+                relationships.append({
+                    "parent": parent_term.term_string,
+                    "child": child_term.term_string
+                })
+        return relationships
+
+    def build_hierarchy(self):
+        G = nx.DiGraph()
+        relationships = self.build_relationships()
+
+        for relationship in relationships:
+            G.add_edge(relationship["child"], relationship["parent"])
+
+        return G
 
     def create_relationships(self):
         if self.source_file:
