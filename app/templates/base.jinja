@@ -144,10 +144,6 @@
                 {% endif %}
             </div>
 
-            {% block content %}
-
-            {% endblock content %}
-
             {% with messages = get_flashed_messages() %}
             {% if messages %}
             <div class="alert alert-success alert-dismissible fade show w-40 mt-2" role="alert">
@@ -158,6 +154,11 @@
             </div>
             {% endif %}
             {% endwith %}
+            {% block content %}
+
+            {% endblock content %}
+
+
         </div>
 
         <footer class="container text-end text-muted" style="width: 100%; margin-top: auto;">

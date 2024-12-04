@@ -1,4 +1,6 @@
-from flask import (flash, redirect, render_template, url_for, request)
+import os
+from flask import (flash, redirect, render_template,
+                   send_file, url_for, request)
 from flask_login import current_user, login_required
 
 from app.term import term_blueprint as term
@@ -103,3 +105,19 @@ def remove_tag_from_term_set(term_set_id, tag_id):
     else:
         flash("Tag not found in term set.")
     return redirect(url_for("term.display_term_set", term_set_id=term_set_id))
+
+
+@term.route("/set/download_file/<filename>", methods=["GET"])
+@login_required
+def download_file(filename):
+    import_dir = os.path.join(current_app.root_path, 'io', 'import')
+    file_path = os.path.join(import_dir, filename)
+
+    # Log the file path for debugging
+    current_app.logger.debug(f"Looking for file at: {file_path}")
+
+    if os.path.exists(file_path):
+        return send_file(file_path, as_attachment=True)
+    else:
+        flash("File not found.")
+        return redirect(url_for("term.list_terms"))

@@ -1,3 +1,5 @@
+from flask_login import current_user
+from app.term.models import Ark
 from rdflib import URIRef
 from sqlalchemy.ext.hybrid import hybrid_property
 
@@ -7,8 +9,10 @@ from app import db
 class Relationship(db.Model):
     __tablename__ = "relationships"
     id = db.Column(db.Integer, primary_key=True)
-    ark_id = db.Column(db.Integer, db.ForeignKey("arks.id"), nullable=True)
-    owner_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    ark_id = db.Column(db.Integer, db.ForeignKey("arks.id"),
+                       nullable=True, default=lambda: Ark.create_ark().id)
+    owner_id = db.Column(db.Integer, db.ForeignKey(
+        "users.id"), default=lambda: current_user.id)
     created = db.Column(db.DateTime, default=db.func.now())
     modified = db.Column(db.DateTime, default=db.func.now(),
                          onupdate=db.func.now())
@@ -23,7 +27,6 @@ class Relationship(db.Model):
     # Establish relationships
     predicate = db.relationship(
         "Term", foreign_keys=[predicate_id], backref="relationships_as_predicate")
-
     ark = db.relationship("Ark", foreign_keys=[
                           ark_id], backref="relationships")
 

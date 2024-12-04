@@ -33,18 +33,18 @@ def import_document():
                 db.session.refresh(new_tag)
 
         if uploaded_file.filename.endswith(".json"):
-            imported_terms = process_json_upload(uploaded_file)
+            imported_terms, source_file = process_json_upload(uploaded_file)
         elif uploaded_file.filename.endswith(".csv"):
-            imported_terms = process_csv_upload(uploaded_file)
+            imported_terms, source_file = process_csv_upload(uploaded_file)
         elif uploaded_file.filename.endswith(".owl"):
-            imported_terms = process_owl_upload(uploaded_file)
+            imported_terms, source_file = process_owl_upload(uploaded_file)
         else:
             flash("File type not supported", "danger")
             return redirect(url_for('io.import_document'))
 
         if imported_terms:
             term_set = TermSet(
-                source=uploaded_file.filename,
+                source=source_file,
                 description=set_description,
                 user_id=owner_id,
                 name=set_name,

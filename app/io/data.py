@@ -9,24 +9,38 @@ from app.term.models import Term, TermSet
 from app.user.models import User
 from flask import Response, current_app, make_response, request
 from flask_login import current_user
+from werkzeug.utils import secure_filename
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
 
 
+def save_data_file(data_file):
+    import_dir = os.path.join(base_dir, "import")
+    if not os.path.exists(import_dir):
+        os.makedirs(import_dir)
+    filename = secure_filename(data_file.filename)
+    file_path = os.path.join(import_dir, filename)
+    data_file.save(file_path)
+    return file_path, filename
+
+
 def process_csv_upload(data_file):
-    csv_dataframe = pandas.read_csv(data_file)
-    return csv_dataframe.to_dict(orient="records")
+    file_path, file_name = save_data_file(data_file)
+    csv_dataframe = pandas.read_csv(file_path)
+    return csv_dataframe.to_dict(orient="records"), file_name
 
 
 def process_json_upload(data_file):
-    json_dataframe = pandas.read_json(data_file)
-    return json_dataframe["Terms"]
+    file_path, file_name = save_data_file(data_file)
+    json_dataframe = pandas.read_json(file_path)
+    return json_dataframe["Terms"], file_name
 
 
 def process_owl_upload(data_file):
-    handler = OwlHandler("app/io/import/bfo.owl")
+    file_path, file_name = save_data_file(data_file)
+    handler = OwlHandler(file_path)
     terms = handler.get_ontology_terms()
-    return terms
+    return terms, file_name
 
 
 def import_term_dict(term_dict, term_set, new_tag):
@@ -92,7 +106,7 @@ def import_helio_term_dict(term_dict, term_set, tag):
 
 
 def export_term_dict(search_terms=None) -> Response:
-    if search_terms is None:
+    if (search_terms is None):
         term_list = (
             db.session.query(Term)
             .with_entities(
