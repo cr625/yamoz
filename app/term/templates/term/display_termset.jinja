@@ -5,11 +5,14 @@
 {% endblock %}
 
 {% block headline %}
-{{ term_set.name}}
+Term Set
 {% endblock headline %}
 
 {% block content %}
 <div class="card">
+    <div class="card-header" style="font-size: 1.5rem; font-weight: bold;">
+        {{ term_set.name }}
+    </div>
     <div class="card-body">
         <div class="row mb-2">
             <div class="col-auto" style="width: 120px;">
@@ -45,13 +48,16 @@
                 </p>
             </div>
         </div>
-        <div class="d-flex justify-content-start">
+        <div class="d-flex justify-content-end">
             <form action="{{ url_for('term.edit_termset', term_set_id=term_set.id) }}" method="get" class="me-2">
-                <button type="submit" class="btn btn-dark">Edit</button>
+                <button type="submit" class="btn btn-sm btn-dark">Edit</button>
             </form>
-            <form action="{{ url_for('term.delete_term_set', term_set_id=term_set.id) }}" method="post">
-                <button type="submit" class="btn btn-dark">Delete</button>
-            </form>
+            <button type="button" class="btn btn-sm btn-dark me-2" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                Delete
+            </button>
+            <button type="button" class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#copyModal">
+                Create From
+            </button>
         </div>
     </div>
 </div>
@@ -64,13 +70,16 @@
 <!-- Bootstrap Tabs -->
 <ul class="nav nav-tabs" id="termSetTabs" role="tablist">
     <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="terms-tab" data-bs-toggle="tab" data-bs-target="#terms" type="button" role="tab" aria-controls="terms" aria-selected="true">Terms</button>
+        <button class="nav-link active" id="terms-tab" data-bs-toggle="tab" data-bs-target="#terms" type="button"
+            role="tab" aria-controls="terms" aria-selected="true">Terms</button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="relationships-tab" data-bs-toggle="tab" data-bs-target="#relationships" type="button" role="tab" aria-controls="relationships" aria-selected="false">Relationships</button>
+        <button class="nav-link" id="relationships-tab" data-bs-toggle="tab" data-bs-target="#relationships"
+            type="button" role="tab" aria-controls="relationships" aria-selected="false">Relationships</button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="classes-tab" data-bs-toggle="tab" data-bs-target="#classes" type="button" role="tab" aria-controls="classes" aria-selected="false">Classes</button>
+        <button class="nav-link" id="classes-tab" data-bs-toggle="tab" data-bs-target="#classes" type="button"
+            role="tab" aria-controls="classes" aria-selected="false">Classes</button>
     </li>
 </ul>
 <div class="tab-content" id="termSetTabsContent">
@@ -78,10 +87,53 @@
         {% include 'term/_term_list.jinja' %}
     </div>
     <div class="tab-pane fade" id="relationships" role="tabpanel" aria-labelledby="relationships-tab">
-       {% include 'term/_termset_relationships.jinja' %}
+        {% include 'term/_termset_relationships.jinja' %}
     </div>
     <div class="tab-pane fade" id="classes" role="tabpanel" aria-labelledby="classes-tab">
         <a href="{{ url_for('term.display_classes', term_set_id=term_set.id) }}">Display Classes</a>
+    </div>
+</div>
+
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this term set?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{{ url_for('term.delete_term_set', term_set_id=term_set.id) }}" method="post">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Copy Confirmation Modal -->
+<div class="modal fade" id="copyModal" tabindex="-1" aria-labelledby="copyModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="copyModalLabel">Confirm Copy</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to copy this term set?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{{ url_for('term.copy_termset', term_set_id=term_set.id) }}" method="post">
+                    <button type="submit" class="btn btn-primary">Copy</button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 

@@ -199,3 +199,31 @@ def display_classes(term_set_id):
     hierarchy_data = build_tree(root[0])
 
     return render_template("term/display_termset_classes.jinja", hierarchy=hierarchy_data, term_set=term_set)
+
+
+@term.route("/set/copy/<int:term_set_id>", methods=["POST"])
+@login_required
+def copy_termset(term_set_id):
+    original_term_set = TermSet.query.get_or_404(term_set_id)
+    new_term_set = TermSet(
+        name=f"Copy of {original_term_set.name}",
+        description=original_term_set.description,
+        source=original_term_set.source,
+        user_id=current_user.id,
+        created=db.func.now(),
+        updated=db.func.now()
+    )
+    db.session.add(new_term_set)
+    db.session.commit()
+
+    # Copy tags
+    for tag in original_term_set.tags:
+        new_term_set.tags.append(tag)
+
+    # Copy terms
+    for term in original_term_set.terms:
+        new_term_set.terms.append(term)
+
+    db.session.commit()
+    flash("Term set copied successfully.")
+    return redirect(url_for("term.edit_termset", term_set_id=new_term_set.id))
