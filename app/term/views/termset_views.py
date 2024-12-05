@@ -21,7 +21,7 @@ def list_term_sets():
 
 
 @term.route("/set/display/<int:term_set_id>")
-def display_term_set(term_set_id):
+def display_termset(term_set_id):
     term_set = TermSet.query.get_or_404(term_set_id)
     tag_form = AddTagForm()
     tag_form.tag_list.choices = [(tag.id, tag.value)
@@ -39,7 +39,7 @@ def display_term_set(term_set_id):
         relationship.termset_name = term_set.name
 
     return render_template(
-        "term/display_term_set.jinja",
+        "term/display_termset.jinja",
         term_set=term_set,
         form=EmptyForm(),
         tag_form=tag_form,
@@ -57,7 +57,7 @@ def edit_term_set(term_set_id):
         form.populate_obj(term_set)
         db.session.commit()
         flash("Term set updated.")
-        return redirect(url_for("term.display_term_set", term_set_id=term_set_id))
+        return redirect(url_for("term.display_termset", term_set_id=term_set_id))
     else:
         if request.method == "POST":
             flash("Error: Form validation failed.")
@@ -104,7 +104,7 @@ def add_tag_to_term_set(term_set_id):
                     flash("Tag already exists in the term set.")
             else:
                 flash("Invalid tag selected.")
-    return redirect(url_for("term.display_term_set", term_set_id=term_set_id))
+    return redirect(url_for("term.display_termset", term_set_id=term_set_id))
 
 
 @term.route("/set/remove_tag/<int:term_set_id>/<int:tag_id>", methods=["POST"])
@@ -119,7 +119,7 @@ def remove_tag_from_term_set(term_set_id, tag_id):
         flash("Tag removed.")
     else:
         flash("Tag not found in term set.")
-    return redirect(url_for("term.display_term_set", term_set_id=term_set_id))
+    return redirect(url_for("term.display_termset", term_set_id=term_set_id))
 
 
 @term.route("/set/download_file/<filename>", methods=["GET"])
@@ -176,7 +176,7 @@ def list_termset_relationships(term_set_id):
     return render_template("term/list_termset_relations.jinja", relationships=relationships)
 
 
-@term.route("/set/classes/<int:term_set_id>")
+@term.route("/set/classes/display/<int:term_set_id>")
 def display_classes(term_set_id):
     term_set = TermSet.query.get_or_404(term_set_id)
     classifier = OntologyClassifier(term_set)
@@ -186,7 +186,7 @@ def display_classes(term_set_id):
     root = [node for node, degree in hierarchy.in_degree() if degree == 0]
     if not root:
         flash("No root node found for the hierarchy.")
-        return redirect(url_for("term.display_term_set", term_set_id=term_set_id))
+        return redirect(url_for("term.display_termset", term_set_id=term_set_id))
 
     # Convert the hierarchy to a nested dictionary format
     def build_tree(node):
@@ -198,4 +198,4 @@ def display_classes(term_set_id):
         }
     hierarchy_data = build_tree(root[0])
 
-    return render_template("term/display_classes.jinja", hierarchy=hierarchy_data, term_set=term_set)
+    return render_template("term/display_termset_classes.jinja", hierarchy=hierarchy_data, term_set=term_set)

@@ -48,7 +48,7 @@ term.display_term                 GET        /term/ark/99152/<concept_id>
 term.display_term                 GET        /term/ark:99152/<concept_id>
 term.display_term                 GET        /term/ark:/99152/<concept_id>
 term.display_term_by_id           GET        /term/id/<term_id>
-term.display_term_set             GET        /term/set/display/<int:term_set_id>
+term.display_termset             GET        /term/set/display/<int:term_set_id>
 term.edit_tag                     GET, POST  /term/tag/edit/<int:tag_id>
 term.edit_term                    POST       /term/contribute/edit/<concept_id>
 term.list_alphabetical            GET        /term/list/alphabetical
