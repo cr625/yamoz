@@ -11,7 +11,7 @@ Edit Term Set: {{ term_set.name }}
 {% block content %}
 <form action="{{ url_for('term.edit_termset', term_set_id=term_set.id) }}" method="post">
     {{ form.hidden_tag() }}
-    {% include 'term/_termset_form_fields.jinja' %}
+    {% include 'termset/_form_fields.jinja' %}
 </form>
 
 {% include 'term/_term_list.jinja' %}
