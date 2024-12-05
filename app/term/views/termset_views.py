@@ -50,7 +50,7 @@ def populate_relationships(relationships, term_set):
 @term.route("/set/list")
 def list_termsets():
     term_sets = TermSet.query.order_by(TermSet.name)
-    return render_template("term/list_termsets.jinja", term_sets=term_sets)
+    return render_template("termset/list_termsets.jinja", term_sets=term_sets)
 
 
 @term.route("/set/display/<int:term_set_id>")
@@ -65,7 +65,7 @@ def display_termset(term_set_id):
     relationships = populate_relationships(term_set.relationships, term_set)
 
     return render_template(
-        "term/display_termset.jinja",
+        "termset/display_termset.jinja",
         term_set=term_set,
         form=EmptyForm(),
         tag_form=tag_form,
@@ -93,7 +93,7 @@ def edit_termset(term_set_id):
                     flash(
                         f"Error in {getattr(form, field).label.text}: {error}")
 
-    return render_template("term/edit_termset.jinja", form=form, term_set=term_set)
+    return render_template("termset/edit_termset.jinja", form=form, term_set=term_set)
 
 
 @term.route("/set/delete/<int:term_set_id>", methods=["POST"])
@@ -176,7 +176,7 @@ def classify_ontology(term_set_id):
     new_relationships = populate_relationships(relationships, term_set)
 
     flash("OntologyClassifier completed.")
-    return render_template("term/list_termset_relations.jinja", relationships=new_relationships)
+    return render_template("termset/list_relations.jinja", relationships=new_relationships)
 
 
 @term.route("/set/relationships/<int:term_set_id>")
@@ -202,7 +202,7 @@ def display_classes(term_set_id):
     term_set = TermSet.query.get_or_404(term_set_id)
     hierarchy_data = get_hierarchy_data(term_set_id)
 
-    return render_template("term/display_termset_classes.jinja", hierarchy=hierarchy_data, term_set=term_set)
+    return render_template("termset/display_classes.jinja", hierarchy=hierarchy_data, term_set=term_set)
 
 
 @term.route("/set/copy/<int:term_set_id>", methods=["POST"])
