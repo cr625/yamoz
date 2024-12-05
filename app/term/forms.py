@@ -82,3 +82,8 @@ class EditTermSetForm(FlaskForm):
         self.tag_list.choices = [(tag.id, tag.value)
                                  for tag in Tag.query.order_by(Tag.value).all()]
     '''
+
+
+class AddSubClassForm(FlaskForm):
+    subject = StringField("Subject", validators=[DataRequired()])
+    submit = SubmitField("Add Subclass")

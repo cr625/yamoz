@@ -4,14 +4,13 @@ from flask import (flash, redirect, render_template,
 from flask_login import current_user, login_required
 
 from app.term import term_blueprint as term
-from app.term.forms import *
-from app.term.models import *
+from app.term.forms import EmptyForm, AddTagForm, EditTermSetForm, AddSubClassForm
+from app.term.models import TermSet, Tag, Term, Ark
 from app.user.models import User
 from app.term.views.list_views import *
-from app.term.views.tag_views import create_tag
-from app.utilities import *
+
+
 from app.io.ontology import OntologyClassifier
-import networkx as nx
 
 
 def get_hierarchy_data(term_set_id):
@@ -57,6 +56,7 @@ def list_termsets():
 def display_termset(term_set_id):
     term_set = TermSet.query.get_or_404(term_set_id)
     tag_form = AddTagForm()
+    add_subclass_form = AddSubClassForm()
     tag_form.tag_list.choices = [(tag.id, tag.value)
                                  for tag in Tag.query.order_by(Tag.value).all()]
 
@@ -69,9 +69,26 @@ def display_termset(term_set_id):
         term_set=term_set,
         form=EmptyForm(),
         tag_form=tag_form,
+        subclass_form=add_subclass_form,
         relationships=relationships,
         hierarchy=hierarchy_data
     )
+
+
+@term.route("/set/add_subclass/<int:term_set_id>", methods=["POST"])
+@login_required
+def add_subclass(term_set_id):
+    term_set = TermSet.query.get_or_404(term_set_id)
+    add_subclass_form = AddSubClassForm()
+
+    if add_subclass_form.validate_on_submit():
+        # Process the form data and add the subclass
+        # ...existing code to handle form submission...
+        flash("Subclass added successfully.")
+    else:
+        flash("Error: Form validation failed.")
+
+    return redirect(url_for("term.display_termset", term_set_id=term_set_id, tab="classes"))
 
 
 @term.route("/set/edit/<int:term_set_id>", methods=["GET", "POST"])

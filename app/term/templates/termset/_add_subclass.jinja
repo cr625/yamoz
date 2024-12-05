@@ -1,0 +1,7 @@
+
+<form method="POST" action="{{ url_for('term.add_subclass', term_set_id=term_set.id) }}">
+    {{ subclass_form.hidden_tag() }}
+    {{ subclass_form.csrf_token }}
+    {{ subclass_form.subject.label }} {{ subclass_form.subject }}
+    {{ subclass_form.submit }}
+</form>
