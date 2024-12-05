@@ -1,42 +1,31 @@
-<div id="taxonomy"></div>
-
-<style>
-    .active-node {
-        text-decoration: underline;
-        text-decoration-style: dashed;
-        text-decoration-color: gray;
-        text-decoration-thickness: 1px;
-    }
-</style>
-
 <script>
-    const hierarchyData = {{ hierarchy | tojson }};
-    const container = document.getElementById('taxonomy');
-
-    function createTree(data, parent) {
-        const ul = document.createElement('ul');
-        parent.appendChild(ul);
-
-        data.forEach(node => {
-            const li = document.createElement('li');
-            li.innerHTML = `
-                <span class="active-node" data-bs-toggle="tooltip" title="${node.definition}">
-                    ${node.name}
-                </span>
-                <i class="bi bi-plus-circle add-subclass-icon" data-term="${node.name}" title="Add Subclass"></i>
-            `;
-            ul.appendChild(li);
-
-            if (node.children) {
-                createTree(node.children, li);
-            }
-        });
-    }
-
-    createTree([hierarchyData], container);
-
-    // Initialize Bootstrap tooltips
     document.addEventListener('DOMContentLoaded', function () {
+        const hierarchyData = {{ hierarchy | tojson }};
+        const container = document.getElementById('classes');
+
+        function createTree(data, parent) {
+            const ul = document.createElement('ul');
+            parent.appendChild(ul);
+
+            data.forEach(node => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span class="active-node" data-bs-toggle="tooltip" title="${node.definition}">
+                        ${node.name}
+                    </span>
+                    <i class="bi bi-plus-circle add-subclass-icon" data-term-name="${node.name}" title="Add Subclass"></i>
+                `;
+                ul.appendChild(li);
+
+                if (node.children) {
+                    createTree(node.children, li);
+                }
+            });
+        }
+
+        createTree([hierarchyData], container);
+
+        // Initialize Bootstrap tooltips
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl)
@@ -45,30 +34,28 @@
         // Add event listener for add subclass icons
         document.querySelectorAll('.add-subclass-icon').forEach(icon => {
             icon.addEventListener('click', function () {
-                const term = this.getAttribute('data-term');
-                openAddSubclassForm(term);
+                const termName = this.getAttribute('data-term-name');
+                openAddSubclassForm(termName);
             });
         });
     });
 
-    function openAddSubclassForm(term) {
-        // Open the form modal and pre-fill the fields
-        const formModal = new bootstrap.Modal(document.getElementById('addSubclassModal'));
-        formModal.show();
+    function openAddSubclassForm(termName) {
+        // Fetch term details using term name
+        fetch(`/term/api/name/${encodeURIComponent(termName)}`)
+            .then(response => response.json())
+            .then(data => {
+                // Ensure the modal is fully loaded before setting the values
+                const formModal = new bootstrap.Modal(document.getElementById('addSubclassModal'));
+                formModal.show();
+
+                formModal._element.addEventListener('shown.bs.modal', function () {
+                    // Pre-fill the form fields
+                    document.getElementById('termString').textContent = data.term_string;
+                    document.getElementById('termDefinition').textContent = data.definition;
+                    document.getElementById('parentTermId').value = data.id;
+                });
+            })
+            .catch(error => console.error('Error fetching term data:', error));
     }
 </script>
-
-<!-- Add Subclass Modal -->
-<div class="modal fade" id="addSubclassModal" tabindex="-1" aria-labelledby="addSubclassModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addSubclassModalLabel">Add Subclass</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                   {% include "termset/_add_subclass.jinja"%}
-            </div>
-        </div>
-    </div>
-</div>
