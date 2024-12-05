@@ -55,7 +55,7 @@ term.list_alphabetical            GET        /term/list/alphabetical
 term.list_recent                  GET        /term/list/recent
 term.list_score                   GET        /term/list/score
 term.list_tags                    GET        /term/tag/list
-term.list_term_sets               GET        /term/set/list
+term.list_termsets               GET        /term/set/list
 term.list_terms                   GET        /term/list
 term.list_terms_by_tag            GET        /term/list/tag/<int:tag_id>
 term.list_top_terms_alphabetical  GET        /term/list/alphabetical/top

@@ -15,9 +15,9 @@ import networkx as nx
 
 
 @term.route("/set/list")
-def list_term_sets():
+def list_termsets():
     term_sets = TermSet.query.order_by(TermSet.name)
-    return render_template("term/list_term_sets.jinja", term_sets=term_sets)
+    return render_template("term/list_termsets.jinja", term_sets=term_sets)
 
 
 @term.route("/set/display/<int:term_set_id>")
@@ -49,7 +49,7 @@ def display_termset(term_set_id):
 
 @term.route("/set/edit/<int:term_set_id>", methods=["GET", "POST"])
 @login_required
-def edit_term_set(term_set_id):
+def edit_termset(term_set_id):
     term_set = TermSet.query.get_or_404(term_set_id)
     form = EditTermSetForm(obj=term_set)
 
@@ -66,7 +66,7 @@ def edit_term_set(term_set_id):
                     flash(
                         f"Error in {getattr(form, field).label.text}: {error}")
 
-    return render_template("term/edit_term_set.jinja", form=form, term_set=term_set)
+    return render_template("term/edit_termset.jinja", form=form, term_set=term_set)
 
 
 @term.route("/set/delete/<int:term_set_id>", methods=["POST"])
@@ -79,7 +79,7 @@ def delete_term_set(term_set_id):
         flash("Term set deleted.")
     else:
         flash("You are not authorized to delete this term set.")
-    return redirect(url_for("term.list_term_sets"))
+    return redirect(url_for("term.list_termsets"))
 
 
 @term.route("/set/add_tag/<int:term_set_id>", methods=["POST"])
