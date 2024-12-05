@@ -14,6 +14,39 @@ from app.io.ontology import OntologyClassifier
 import networkx as nx
 
 
+def get_hierarchy_data(term_set_id):
+    term_set = TermSet.query.get_or_404(term_set_id)
+    classifier = OntologyClassifier(term_set)
+    hierarchy = classifier.build_hierarchy()
+
+    # Identify a root node (a node with no incoming edges)
+    root = [node for node, degree in hierarchy.in_degree() if degree == 0]
+    if not root:
+        flash("No root node found for the hierarchy.")
+        return redirect(url_for("term.display_termset", term_set_id=term_set_id))
+
+    # Convert the hierarchy to a nested dictionary format
+    def build_tree(node):
+        children = list(hierarchy.successors(node))
+        return {
+            "name": node,
+            "definition": hierarchy.nodes[node].get('definition', 'No definition available'),
+            "children": [build_tree(child) for child in children]
+        }
+    hierarchy_data = build_tree(root[0])
+    return hierarchy_data
+
+
+def populate_relationships(relationships, term_set):
+    attributes = ['parent', 'predicate', 'child', 'owner', 'ark']
+    for relationship in relationships:
+        for attr in attributes:
+            setattr(relationship, attr, Term.query.get(
+                getattr(relationship, f"{attr}_id")))
+        relationship.termset_name = term_set.name
+    return relationships
+
+
 @term.route("/set/list")
 def list_termsets():
     term_sets = TermSet.query.order_by(TermSet.name)
@@ -27,16 +60,9 @@ def display_termset(term_set_id):
     tag_form.tag_list.choices = [(tag.id, tag.value)
                                  for tag in Tag.query.order_by(Tag.value).all()]
 
-    relationships = term_set.relationships
+    hierarchy_data = get_hierarchy_data(term_set_id)
 
-    # Fetch term strings for relationships
-    for relationship in relationships:
-        relationship.parent = Term.query.get(relationship.parent_id)
-        relationship.predicate = Term.query.get(relationship.predicate_id)
-        relationship.child = Term.query.get(relationship.child_id)
-        relationship.owner = User.query.get(relationship.owner_id)
-        relationship.ark = Ark.query.get(relationship.ark_id)
-        relationship.termset_name = term_set.name
+    relationships = populate_relationships(term_set.relationships, term_set)
 
     return render_template(
         "term/display_termset.jinja",
@@ -44,6 +70,7 @@ def display_termset(term_set_id):
         form=EmptyForm(),
         tag_form=tag_form,
         relationships=relationships,
+        hierarchy=hierarchy_data
     )
 
 
@@ -138,24 +165,18 @@ def download_file(filename):
         return redirect(url_for("term.list_terms"))
 
 
-@term.route("/set/test_ontology/<int:term_set_id>")
+@term.route("/set/classify_ontology/<int:term_set_id>")
 @login_required
-def test_ontology(term_set_id):
+def classify_ontology(term_set_id):
     term_set = TermSet.query.get_or_404(term_set_id)
     classifier = OntologyClassifier(term_set)
     relationships = classifier.create_relationships()
 
     # Fetch term strings for relationships
-    for relationship in relationships:
-        relationship.parent = Term.query.get(relationship.parent_id)
-        relationship.predicate = Term.query.get(relationship.predicate_id)
-        relationship.child = Term.query.get(relationship.child_id)
-        relationship.owner = User.query.get(relationship.owner_id)
-        relationship.ark = Ark.query.get(relationship.ark_id)
-        relationship.termset_name = term_set.name
+    new_relationships = populate_relationships(relationships, term_set)
 
-    flash("OntologyClassifier test completed.")
-    return render_template("term/list_termset_relations.jinja", relationships=relationships)
+    flash("OntologyClassifier completed.")
+    return render_template("term/list_termset_relations.jinja", relationships=new_relationships)
 
 
 @term.route("/set/relationships/<int:term_set_id>")
@@ -179,24 +200,7 @@ def list_termset_relationships(term_set_id):
 @term.route("/set/classes/display/<int:term_set_id>")
 def display_classes(term_set_id):
     term_set = TermSet.query.get_or_404(term_set_id)
-    classifier = OntologyClassifier(term_set)
-    hierarchy = classifier.build_hierarchy()
-
-    # Identify a root node (a node with no incoming edges)
-    root = [node for node, degree in hierarchy.in_degree() if degree == 0]
-    if not root:
-        flash("No root node found for the hierarchy.")
-        return redirect(url_for("term.display_termset", term_set_id=term_set_id))
-
-    # Convert the hierarchy to a nested dictionary format
-    def build_tree(node):
-        children = list(hierarchy.successors(node))
-        return {
-            "name": node,
-            "definition": hierarchy.nodes[node].get('definition', 'No definition available'),
-            "children": [build_tree(child) for child in children]
-        }
-    hierarchy_data = build_tree(root[0])
+    hierarchy_data = get_hierarchy_data(term_set_id)
 
     return render_template("term/display_termset_classes.jinja", hierarchy=hierarchy_data, term_set=term_set)
 
