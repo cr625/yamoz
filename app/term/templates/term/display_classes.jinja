@@ -1,26 +1,40 @@
 {% extends 'base.jinja' %}
 
 {% block title %}
-Taxonomy View
+Class View
 {% endblock %}
 
 {% block content %}
 <h2>Taxonomy View</h2>
-<div id="taxonomy">
-    <ul>
-        {% macro render_node(node) %}
-            <li>
-                {{ node.name }}
-                {% if node.children %}
-                    <ul>
-                        {% for child in node.children %}
-                            {{ render_node(child) }}
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            </li>
-        {% endmacro %}
-        {{ render_node(hierarchy) }}
-    </ul>
-</div>
+<div id="taxonomy"></div>
+
+<script>
+    const hierarchyData = {{ hierarchy | tojson }};
+    const container = document.getElementById('taxonomy');
+
+    function createTree(data, parent) {
+        const ul = document.createElement('ul');
+        parent.appendChild(ul);
+
+        data.forEach(node => {
+            const li = document.createElement('li');
+            li.innerHTML = `<span data-bs-toggle="tooltip" title="${node.definition}">${node.name}</span>`;
+            ul.appendChild(li);
+
+            if (node.children) {
+                createTree(node.children, li);
+            }
+        });
+    }
+
+    createTree([hierarchyData], container);
+
+    // Initialize Bootstrap tooltips
+    document.addEventListener('DOMContentLoaded', function () {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    });
+</script>
 {% endblock %}

@@ -72,6 +72,10 @@ class OntologyClassifier:
         for relationship in relationships:
             G.add_edge(relationship["child"], relationship["parent"])
 
+        # Add term definitions as node attributes
+        for term in self.terms:
+            G.nodes[term.term_string]['definition'] = term.definition
+
         return G
 
     def create_relationships(self):

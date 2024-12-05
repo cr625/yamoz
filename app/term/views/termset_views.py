@@ -193,9 +193,9 @@ def display_classes(term_set_id):
         children = list(hierarchy.successors(node))
         return {
             "name": node,
+            "definition": hierarchy.nodes[node].get('definition', 'No definition available'),
             "children": [build_tree(child) for child in children]
         }
-
     hierarchy_data = build_tree(root[0])
 
     return render_template("term/display_classes.jinja", hierarchy=hierarchy_data, term_set=term_set)
