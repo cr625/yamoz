@@ -2,7 +2,7 @@ from rdflib import URIRef
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from app import db
-from app.term.models.association_tables import termset_relationships
+from app.term.models.association_tables import termset_relationships, relationship_tags
 
 
 class Relationship(db.Model):
@@ -32,6 +32,9 @@ class Relationship(db.Model):
         secondary=termset_relationships,
         back_populates="relationships",
     )
+
+    tags = db.relationship(
+        "Tag", secondary=relationship_tags, back_populates="relationships")
 
     @hybrid_property
     def ark_concept_id(self):

@@ -5,10 +5,10 @@ from flask_login import current_user, login_required
 
 from app.term import term_blueprint as term
 from app.term.forms import EmptyForm, AddTagForm, EditTermSetForm, AddSubClassForm
-from app.term.models import TermSet, Tag, Term, Ark
+from app.term.models import TermSet, Tag, Term, Ark, Relationship
 from app.user.models import User
 from app.term.views.list_views import *
-
+from app.term.models.association_tables import termset_relationships
 
 from app.io.ontology import OntologyClassifier
 
@@ -37,11 +37,12 @@ def get_hierarchy_data(term_set_id):
 
 
 def populate_relationships(relationships, term_set):
-    attributes = ['parent', 'predicate', 'child', 'owner', 'ark']
     for relationship in relationships:
-        for attr in attributes:
-            setattr(relationship, attr, Term.query.get(
-                getattr(relationship, f"{attr}_id")))
+        relationship.parent = Term.query.get(relationship.parent_id)
+        relationship.predicate = Term.query.get(relationship.predicate_id)
+        relationship.child = Term.query.get(relationship.child_id)
+        relationship.owner = User.query.get(relationship.owner_id)
+        relationship.ark = Ark.query.get(relationship.ark_id)
         relationship.termset_name = term_set.name
     return relationships
 
@@ -81,11 +82,43 @@ def add_subclass(term_set_id):
     term_set = TermSet.query.get_or_404(term_set_id)
     add_subclass_form = AddSubClassForm()
 
+    # get the rdfs:subClassOf term
+    rdfs_subclass = Term.query.filter_by(term_string="rdfs:subClassOf").first()
+    child_term = Term.query.filter_by(
+        concept_id=add_subclass_form.child_id.data).first()
+    if not child_term:
+        flash("Error: Child term not found.")
+        return redirect(url_for("term.display_termset", term_set_id=term_set_id, tab="classes"))
+
     if add_subclass_form.validate_on_submit():
-        # Process the form data and add the subclass
-        # ...existing code to handle form submission...
+        relationship = Relationship(
+            parent_id=add_subclass_form.parent_term_id.data,
+            predicate_id=rdfs_subclass.id,
+            child_id=child_term.id,
+            owner_id=current_user.id,
+            ark_id=Ark().create_ark(shoulder="g1", naan="13183").id,
+            created=db.func.now(),
+            modified=db.func.now()
+
+        )
+
+        # Add the specific tag to the relationship
+        subclass_tag = Tag.query.filter_by(value="subclass_added").first()
+        if subclass_tag:
+            relationship.tags.append(subclass_tag)
+        db.session.add(relationship)
+        db.session.commit()
+
+        # Append the relationship to the term set
+        term_set.relationships.append(relationship)
+        db.session.commit()
+
         flash("Subclass added successfully.")
     else:
+        # Log form errors
+        for field, errors in add_subclass_form.errors.items():
+            for error in errors:
+                current_app.logger.error(f"Error in {field}: {error}")
         flash("Error: Form validation failed.")
 
     return redirect(url_for("term.display_termset", term_set_id=term_set_id, tab="classes"))
@@ -202,16 +235,9 @@ def list_termset_relationships(term_set_id):
     term_set = TermSet.query.get_or_404(term_set_id)
     relationships = term_set.relationships
 
-    # Fetch term strings for relationships
-    for relationship in relationships:
-        relationship.parent = Term.query.get(relationship.parent_id)
-        relationship.predicate = Term.query.get(relationship.predicate_id)
-        relationship.child = Term.query.get(relationship.child_id)
-        relationship.owner = User.query.get(relationship.owner_id)
-        relationship.ark = Ark.query.get(relationship.ark_id)
-        relationship.termset_name = term_set.name
+    relationships = populate_relationships(relationships, term_set)
 
-    return render_template("term/list_termset_relations.jinja", relationships=relationships)
+    return render_template("termset/list_relations.jinja", relationships=relationships)
 
 
 @term.route("/set/classes/display/<int:term_set_id>")

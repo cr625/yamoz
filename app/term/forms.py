@@ -1,7 +1,7 @@
 from wtforms import StringField, TextAreaField, SelectField, SubmitField
 from flask import request
 from flask_wtf import FlaskForm
-from wtforms import SubmitField, StringField, TextAreaField, SelectField, BooleanField
+from wtforms import SubmitField, StringField, TextAreaField, SelectField, BooleanField, HiddenField
 from wtforms.validators import DataRequired
 from flask_pagedown.fields import PageDownField
 from app.term.models import Tag
@@ -85,5 +85,6 @@ class EditTermSetForm(FlaskForm):
 
 
 class AddSubClassForm(FlaskForm):
+    parent_term_id = StringField("Parent Term ID", validators=[DataRequired()])
     child_id = StringField("Term ID", validators=[DataRequired()])
     submit = SubmitField("Add Subclass")

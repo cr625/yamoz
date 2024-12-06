@@ -1,5 +1,6 @@
 from app import db
 from .termset import termset_tag_table
+from app.term.models.association_tables import relationship_tags
 
 
 class Tag(db.Model):
@@ -24,6 +25,9 @@ class Tag(db.Model):
         secondary=termset_tag_table,
         back_populates="tags",
     )
+
+    relationships = db.relationship(
+        "Relationship", secondary=relationship_tags, back_populates="tags")
 
     def save(self):
         db.session.add(self)

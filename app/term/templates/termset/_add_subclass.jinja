@@ -13,8 +13,7 @@
         <div id="child_term_string" class="term-string fw-bold"></div>
         <div id="child_definition" class="definition"></div>
     </div>
-    <input type="hidden" id="parentTermId" name="parent_term_id">
-    <div class="form-group">
+        {{ subclass_form.parent_term_id(class="form-control", id="parentTermId") }}    <div class="form-group">
         {{ subclass_form.submit(class="btn btn-dark btn-sm") }}
     </div>
 </form>
