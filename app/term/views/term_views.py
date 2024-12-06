@@ -255,11 +255,11 @@ def search():
     # term_string_matches = Term.query.filter(
     #    Term.term_string.ilike(search_terms)).filter(Term.status != status.archived)
     term_string_matches = Term.query.filter(Term.term_string.regexp_match(
-        term_string_re)).filter(Term.status != status.archived)
+        term_string_re))
 
     vector_search_terms = " & ".join(search_terms.split(" "))
     term_vector_matches = Term.query.filter(Term.search_vector.match(
-        vector_search_terms)).filter(Term.status != status.archived)
+        vector_search_terms))
 
     if session.get('portal_tag'):
         term_string_matches = term_string_matches.filter(
