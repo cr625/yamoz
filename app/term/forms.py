@@ -85,5 +85,5 @@ class EditTermSetForm(FlaskForm):
 
 
 class AddSubClassForm(FlaskForm):
-    subject = StringField("Subject", validators=[DataRequired()])
+    child_id = StringField("Term ID", validators=[DataRequired()])
     submit = SubmitField("Add Subclass")
