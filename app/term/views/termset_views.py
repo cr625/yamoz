@@ -274,3 +274,13 @@ def copy_termset(term_set_id):
     db.session.commit()
     flash("Term set copied successfully.")
     return redirect(url_for("term.edit_termset", term_set_id=new_term_set.id))
+
+
+@term.route("/set/simple/<int:term_set_id>")
+def display_simple_termset(term_set_id):
+    term_set = TermSet.query.get_or_404(term_set_id)
+
+    return render_template(
+        "termset/display_simple_termset.jinja",
+        term_set=term_set,
+    )

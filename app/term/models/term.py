@@ -104,26 +104,6 @@ class Term(db.Model):
 
     comments = db.relationship("Comment", backref="term", lazy="dynamic")
 
-    # Relationships
-    children = db.relationship(
-        "Relationship",
-        foreign_keys=[Relationship.parent_id],
-        backref=db.backref("parent", lazy="joined"),
-        lazy="dynamic",
-    )
-    parents = db.relationship(
-        "Relationship",
-        foreign_keys=[Relationship.child_id],
-        backref=db.backref("child", lazy="joined"),
-        lazy="dynamic",
-        cascade="all, delete-orphan",
-    )
-
-    def add_child_relationship(self, child, predicate):
-        child = Relationship(
-            parent_id=self.id, child_id=child.id, predicate=predicate)
-        child.save()
-
     @property
     def persistent_id(self):
         return ("https://n2t.net/ark:/{}/{}{}").format(
