@@ -74,7 +74,8 @@ class OntologyClassifier:
 
         # Add term definitions as node attributes
         for term in self.terms:
-            G.nodes[term.term_string]['definition'] = term.definition
+            if term.term_string in G.nodes:
+                G.nodes[term.term_string]['definition'] = term.definition
 
         return G
 
