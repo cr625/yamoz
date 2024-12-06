@@ -92,7 +92,7 @@ class OntologyClassifier:
                             parent_class.name)
                         if child_term and parent_term:
                             relationship = self.create_relationship(
-                                child_term, parent_term)  # reversed on purpose because we are looking for subclass relationships
+                                parent_term, child_term)  # reversed ???
                             if relationship:
                                 relationships.append(relationship)
             return relationships
