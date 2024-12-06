@@ -51,8 +51,8 @@
 
                 formModal._element.addEventListener('shown.bs.modal', function () {
                     // Pre-fill the form fields
-                    document.getElementById('termString').textContent = data.term_string;
-                    document.getElementById('termDefinition').textContent = data.definition;
+                    document.getElementById('parentTermString').textContent = data.term_string;
+                    document.getElementById('parentTermDefinition').textContent = data.definition;
                     document.getElementById('parentTermId').value = data.id;
                 });
             })
