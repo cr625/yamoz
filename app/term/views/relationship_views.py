@@ -1,8 +1,8 @@
-from flask import flash, redirect, render_template, url_for
+from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from app.term import term_blueprint as term
-from app.term.forms import AddRelationshipForm
+from app.term.forms import AddRelationshipForm, EditRelationshipForm
 from app.term.models import Ark, Relationship, Tag, Term
 
 
@@ -63,33 +63,38 @@ def edit_relationship(relationship_id):
     choices = [('', 'Select a relationship')] + \
         [(term.concept_id, term.term_string) for term in term_list]
 
-    relationship_form = AddRelationshipForm()
+    relationship_form = EditRelationshipForm()
     relationship_form.predicate_id.choices = choices
+
+    if request.method == 'GET':
+        subject_term = Term.query.get(relationship.child_id)
+        predicate_term = Term.query.get(relationship.predicate_id)
+        object_term = Term.query.get(relationship.parent_id)
+
+        relationship_form.subject_term_string.data = subject_term.term_string if subject_term else ''
+        relationship_form.predicate_id.data = relationship.predicate_id
+        relationship_form.object_term_string.data = object_term.term_string if object_term else ''
 
     if relationship_form.validate_on_submit():
         subject = Term.query.filter_by(
             concept_id=relationship_form.subject_id.data).first()
         predicate = Term.query.filter_by(
             concept_id=relationship_form.predicate_id.data).first()
-        object = Term.query.filter_by(
+        obj = Term.query.filter_by(
             concept_id=relationship_form.object_id.data).first()
 
         if not subject or not predicate or not object:
             flash("Error: One or more terms could not be found.", "danger")
             return redirect(url_for("term.edit_relationship", relationship_id=relationship_id))
 
-        relationship.parent_id = subject.id
+        relationship.child_id = subject.id
         relationship.predicate_id = predicate.id
-        relationship.child_id = object.id
+        relationship.parent_id = object.id
         relationship.save()
 
         return redirect(url_for("term.display_relationship", relationship_id=relationship_id))
 
-    relationship_form.subject_id.data = relationship.parent.concept_id
-    relationship_form.predicate_id.data = relationship.predicate.concept_id
-    relationship_form.object_id.data = relationship.child.concept_id
-
-    return render_template("relationship/edit_relationship.jinja", form=relationship_form)
+    return render_template("relationship/edit_relationship.jinja", form=relationship_form, relationship=relationship)
 
 
 @term.route("/relationship/display/<int:relationship_id>")

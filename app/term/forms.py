@@ -69,6 +69,14 @@ class AddRelationshipForm(FlaskForm):
     submit = SubmitField("Submit")
 
 
+class EditRelationshipForm(FlaskForm):
+    subject_term_string = StringField("Subject", validators=[DataRequired()])
+    predicate_id = SelectField("Predicate", validators=[
+                               DataRequired()], choices=[])
+    object_term_string = StringField("Object", validators=[DataRequired()])
+    submit = SubmitField("Submit")
+
+
 class EditTermSetForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
     description = TextAreaField("Description")
