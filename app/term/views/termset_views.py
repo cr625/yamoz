@@ -99,7 +99,6 @@ def add_subclass(term_set_id):
             ark_id=Ark().create_ark(shoulder="g1", naan="13183").id,
             created=db.func.now(),
             modified=db.func.now()
-
         )
 
         # Add the specific tag to the relationship
@@ -112,6 +111,11 @@ def add_subclass(term_set_id):
         # Append the relationship to the term set
         term_set.relationships.append(relationship)
         db.session.commit()
+
+        # Add the child term to the term set if not already a member
+        if child_term not in term_set.terms:
+            term_set.terms.append(child_term)
+            db.session.commit()
 
         flash("Subclass added successfully.")
     else:

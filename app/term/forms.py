@@ -61,7 +61,7 @@ class AddTagForm(FlaskForm):
     submit = SubmitField("Apply Tag")
 
 
-class AddPropertyForm(FlaskForm):
+class AddRelationshipForm(FlaskForm):
     subject_id = StringField("Subject", validators=[DataRequired()])
     predicate_id = SelectField("Predicate", validators=[
         DataRequired()], choices=[])
