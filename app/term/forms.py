@@ -74,7 +74,7 @@ class EditRelationshipForm(FlaskForm):
     predicate_id = SelectField("Predicate", validators=[
                                DataRequired()], choices=[])
     object_term_string = StringField("Object", validators=[DataRequired()])
-    submit = SubmitField("Submit")
+    submit = SubmitField("Save Changes")
 
 
 class EditTermSetForm(FlaskForm):

@@ -107,9 +107,10 @@ def display_relationship(relationship_id):
 @login_required
 def delete_relationship(relationship_id):
     relationship = Relationship.query.get_or_404(relationship_id)
+    term_set_id = request.args.get("term_set_id")
     relationship.delete()
     flash("Relationship deleted.")
-    return redirect(url_for("term.list_properties"))
+    return redirect(url_for("term.display_termset", term_set_id=term_set_id, tab="relationships"))
 
 
 @term.route("/relationship/list/")

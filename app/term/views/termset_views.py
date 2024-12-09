@@ -43,7 +43,7 @@ def populate_relationships(relationships, term_set):
         relationship.child = Term.query.get(relationship.child_id)
         relationship.owner = User.query.get(relationship.owner_id)
         relationship.ark = Ark.query.get(relationship.ark_id)
-        relationship.termset_name = term_set.name
+        relationship.termset_name = term_set.name  # we alrady know this.
     return relationships
 
 
