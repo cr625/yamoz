@@ -24,13 +24,9 @@
                     relationship.parent.term_string }}</a></td>
             <td>{{ relationship.owner.full_name }}</td>
             <td>{{ relationship.ark.full_ark }}</td>
-            <td>{{ relationship.termset_name }}</td>
+            <td>{{ term_set.name }}</td>
             <td><a href="{{ url_for('term.edit_relationship', relationship_id=relationship.id) }}">Edit</a></td>
             <td>
-                {#<form action="{{ url_for('term.delete_relationship', relationship_id=relationship.id) }}"
-                    method="post" onsubmit="return confirm('Are you sure you want to delete this relationship?');">
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                </form>#}
                 <button type="button" class="btn btn-danger btn-sm"
                     onclick="showConfirmDeleteModal('{{ url_for('term.delete_relationship', relationship_id=relationship.id, term_set_id=term_set.id) }}', 'Are you sure you want to delete this relationship?')">Delete</button>
             </td>
