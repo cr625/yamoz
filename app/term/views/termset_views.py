@@ -84,13 +84,13 @@ def log_form_errors(form: Any) -> None:
 
 # Route Handlers
 @term.route("/set/list")
-def list_termsets() -> str:
+def list_termsets():
     term_sets = TermSet.query.order_by(TermSet.name)
     return render_template("termset/list_termsets.jinja", term_sets=term_sets)
 
 
 @term.route("/set/display/<int:term_set_id>")
-def display_termset(term_set_id: int) -> str:
+def display_termset(term_set_id: int):
     term_set = TermSet.query.get_or_404(term_set_id)
     tag_form = AddTagForm()
     add_subclass_form = AddSubClassForm()
@@ -244,7 +244,7 @@ def download_file(filename: str) -> Union[Response, str]:
 
 @term.route("/set/classify_ontology/<int:term_set_id>")
 @login_required
-def classify_ontology(term_set_id: int) -> str:
+def classify_ontology(term_set_id: int):
     term_set = TermSet.query.get_or_404(term_set_id)
     classifier = OntologyClassifier(term_set)
     relationships = classifier.create_relationships()
@@ -258,7 +258,7 @@ def classify_ontology(term_set_id: int) -> str:
 
 @term.route("/set/relationships/<int:term_set_id>")
 @login_required
-def list_termset_relationships(term_set_id: int) -> str:
+def list_termset_relationships(term_set_id: int):
     term_set = TermSet.query.get_or_404(term_set_id)
     relationships = populate_relationships(term_set.relationships, term_set)
 
@@ -266,7 +266,7 @@ def list_termset_relationships(term_set_id: int) -> str:
 
 
 @term.route("/set/classes/display/<int:term_set_id>")
-def display_classes(term_set_id: int) -> str:
+def display_classes(term_set_id: int):
     term_set = TermSet.query.get_or_404(term_set_id)
     hierarchy_data = get_hierarchy_data(term_set_id)
 
@@ -298,6 +298,6 @@ def copy_termset(term_set_id: int) -> Response:
 
 
 @term.route("/set/simple/<int:term_set_id>")
-def display_simple_termset(term_set_id: int) -> str:
+def display_simple_termset(term_set_id: int):
     term_set = TermSet.query.get_or_404(term_set_id)
     return render_template("termset/display_simple_termset.jinja", term_set=term_set)
